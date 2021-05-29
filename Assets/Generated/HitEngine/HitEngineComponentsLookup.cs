@@ -8,36 +8,15 @@
 //------------------------------------------------------------------------------
 public static class HitEngineComponentsLookup {
 
-    public const int AABB = 0;
-    public const int CapuleHitable = 1;
-    public const int CapuleView = 2;
-    public const int CircleHitable = 3;
-    public const int CircleView = 4;
-    public const int Quadtree = 5;
-    public const int RectHitable = 6;
-    public const int RectView = 7;
 
-    public const int TotalComponents = 8;
+
+    public const int TotalComponents = 0;
 
     public static readonly string[] componentNames = {
-        "AABB",
-        "CapuleHitable",
-        "CapuleView",
-        "CircleHitable",
-        "CircleView",
-        "Quadtree",
-        "RectHitable",
-        "RectView"
+
     };
 
     public static readonly System.Type[] componentTypes = {
-        typeof(AABBComponent),
-        typeof(CapuleHitableComponent),
-        typeof(CapuleViewComponent),
-        typeof(CircleHitableComponent),
-        typeof(CircleViewComponent),
-        typeof(QuadtreeComponent),
-        typeof(RectHitableComponent),
-        typeof(RectViewComponent)
+
     };
 }
