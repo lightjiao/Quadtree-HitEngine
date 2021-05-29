@@ -4,7 +4,9 @@ using UnityEngine;
 
 internal class RenderBackground : IInitializeSystem
 {
-    private const float backgroundLength = 20f;
+    // 背景的长宽
+    private const float backgroundLength = 100f;
+    // 一个plane默认的长宽
     private const float planeLength = 10f;
 
     private GameContext _context;
@@ -30,5 +32,7 @@ internal class RenderBackground : IInitializeSystem
             -backgroundLength / 2
         );
         backgroundGo.Link(_context.backgroundEntity);
+
+        Camera.main.orthographicSize = backgroundLength / 2;
     }
 }
