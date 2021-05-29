@@ -1,4 +1,5 @@
 ﻿using Entitas;
+using Entitas.CodeGeneration.Attributes;
 using UnityEngine;
 
 [Game]
@@ -16,6 +17,22 @@ public class ViewComponent : IComponent
 public class PositionComponent : IComponent
 {
     public Vector2 value;
+}
+
+[Game]
+public class RandMoveComponent : IComponent
+{
+    public float speed;
+}
+
+[Game, Unique]
+public class BackgroundComponent : IComponent
+{
+    public GameObject go;
+    public float left;
+    public float right;
+    public float top;
+    public float bottom;
 }
 
 /**

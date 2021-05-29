@@ -15,24 +15,24 @@ public class InitSystem : IInitializeSystem
 
     public void Initialize()
     {
-        for (var i = 0; i < 5; i++)
+        for (var i = 0; i < 20; i++)
         {
             var circleEntity = _context.CreateEntity();
             circleEntity.isNeedView = true;
             circleEntity.AddPosition(new Vector2(Random.Range(-10, 10), Random.Range(-10, 10)));
             circleEntity.AddCircleHitable(Random.Range(1, 3));
 
-            var rectEntity = _context.CreateEntity();
-            rectEntity.isNeedView = true;
-            rectEntity.AddPosition(new Vector2(Random.Range(-10, 10), Random.Range(-10, 10)));
-            rectEntity.AddRectHitable(Random.Range(1, 3), Random.Range(1, 3));
+            //var rectEntity = _context.CreateEntity();
+            //rectEntity.isNeedView = true;
+            //rectEntity.AddPosition(new Vector2(Random.Range(-10, 10), Random.Range(-10, 10)));
+            //rectEntity.AddRectHitable(Random.Range(1, 3), Random.Range(1, 3));
 
-            var capsuleEntity = _context.CreateEntity();
-            capsuleEntity.isNeedView = true;
-            capsuleEntity.AddPosition(new Vector2(Random.Range(-10, 10), Random.Range(-10, 10)));
-            var capsuleRadius = Random.Range(1, 3);
-            var capsuleVec = Vector3.up * capsuleRadius * 2;
-            capsuleEntity.AddCapuleHitable(capsuleRadius, capsuleVec);
+            //var capsuleEntity = _context.CreateEntity();
+            //capsuleEntity.isNeedView = true;
+            //capsuleEntity.AddPosition(new Vector2(Random.Range(-10, 10), Random.Range(-10, 10)));
+            //var capsuleRadius = Random.Range(1, 3);
+            //var capsuleVec = Vector3.up * capsuleRadius * 2;
+            //capsuleEntity.AddCapuleHitable(capsuleRadius, capsuleVec);
         }
     }
 }

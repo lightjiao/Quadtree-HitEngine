@@ -1,6 +1,11 @@
 using Entitas;
 using UnityEngine;
 
+[Game]
+public class InHitComponent : IComponent
+{
+}
+
 /// <summary>
 /// 圆形碰撞框
 /// </summary>
@@ -22,6 +27,7 @@ public class RectHitableComponent : IComponent
 {
     //public Vector2 position;
     public float height;
+
     public float length;
 
     //public float left => position.x - length / 2;

@@ -9,34 +9,43 @@
 public static class GameComponentsLookup {
 
     public const int AxisAlignedBoundingBox = 0;
-    public const int CapuleHitable = 1;
-    public const int CircleHitable = 2;
-    public const int NeedView = 3;
-    public const int Position = 4;
-    public const int Quadtree = 5;
-    public const int RectHitable = 6;
-    public const int View = 7;
+    public const int Background = 1;
+    public const int CapuleHitable = 2;
+    public const int CircleHitable = 3;
+    public const int InHit = 4;
+    public const int NeedView = 5;
+    public const int Position = 6;
+    public const int Quadtree = 7;
+    public const int RandMove = 8;
+    public const int RectHitable = 9;
+    public const int View = 10;
 
-    public const int TotalComponents = 8;
+    public const int TotalComponents = 11;
 
     public static readonly string[] componentNames = {
         "AxisAlignedBoundingBox",
+        "Background",
         "CapuleHitable",
         "CircleHitable",
+        "InHit",
         "NeedView",
         "Position",
         "Quadtree",
+        "RandMove",
         "RectHitable",
         "View"
     };
 
     public static readonly System.Type[] componentTypes = {
         typeof(AxisAlignedBoundingBoxComponent),
+        typeof(BackgroundComponent),
         typeof(CapuleHitableComponent),
         typeof(CircleHitableComponent),
+        typeof(InHitComponent),
         typeof(NeedViewComponent),
         typeof(PositionComponent),
         typeof(QuadtreeComponent),
+        typeof(RandMoveComponent),
         typeof(RectHitableComponent),
         typeof(ViewComponent)
     };
