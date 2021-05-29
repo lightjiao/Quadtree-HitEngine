@@ -16,8 +16,9 @@ public class GameController : MonoBehaviour
 
         _systems = new Feature("System")
             .Add(initFeature)
-            .Add(new ViewFeature(contexts))
-            .Add(new HitEngineFeature(contexts));
+            .Add(new MoveFeature(contexts))
+            .Add(new HitEngineFeature(contexts))
+            .Add(new ViewFeature(contexts));
 
         _systems.Initialize();
     }

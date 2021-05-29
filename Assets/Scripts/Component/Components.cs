@@ -20,9 +20,9 @@ public class PositionComponent : IComponent
 }
 
 [Game]
-public class RandMoveComponent : IComponent
+public class RandMoverComponent : IComponent
 {
-    public float speed;
+    public Vector2 speed;
 }
 
 [Game, Unique]

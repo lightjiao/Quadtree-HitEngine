@@ -4,8 +4,8 @@ using UnityEngine;
 
 internal class RenderBackground : IInitializeSystem
 {
-    private const float backgroundLength = 10f;
-    private const float planeLength = 5f;
+    private const float backgroundLength = 20f;
+    private const float planeLength = 10f;
 
     private GameContext _context;
 

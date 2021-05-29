@@ -16,7 +16,7 @@ public static class GameComponentsLookup {
     public const int NeedView = 5;
     public const int Position = 6;
     public const int Quadtree = 7;
-    public const int RandMove = 8;
+    public const int RandMover = 8;
     public const int RectHitable = 9;
     public const int View = 10;
 
@@ -31,7 +31,7 @@ public static class GameComponentsLookup {
         "NeedView",
         "Position",
         "Quadtree",
-        "RandMove",
+        "RandMover",
         "RectHitable",
         "View"
     };
@@ -45,7 +45,7 @@ public static class GameComponentsLookup {
         typeof(NeedViewComponent),
         typeof(PositionComponent),
         typeof(QuadtreeComponent),
-        typeof(RandMoveComponent),
+        typeof(RandMoverComponent),
         typeof(RectHitableComponent),
         typeof(ViewComponent)
     };

@@ -5,5 +5,6 @@
         Add(new AddViewSystem(contexts));
         Add(new RenderPositionSystem(contexts));
         Add(new RenderHitableSystem(contexts));
+        Add(new RenderInHitSystem(contexts));
     }
 }

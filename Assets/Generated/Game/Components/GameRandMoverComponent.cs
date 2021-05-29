@@ -8,25 +8,25 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    public RandMoveComponent randMove { get { return (RandMoveComponent)GetComponent(GameComponentsLookup.RandMove); } }
-    public bool hasRandMove { get { return HasComponent(GameComponentsLookup.RandMove); } }
+    public RandMoverComponent randMover { get { return (RandMoverComponent)GetComponent(GameComponentsLookup.RandMover); } }
+    public bool hasRandMover { get { return HasComponent(GameComponentsLookup.RandMover); } }
 
-    public void AddRandMove(float newSpeed) {
-        var index = GameComponentsLookup.RandMove;
-        var component = (RandMoveComponent)CreateComponent(index, typeof(RandMoveComponent));
+    public void AddRandMover(UnityEngine.Vector2 newSpeed) {
+        var index = GameComponentsLookup.RandMover;
+        var component = (RandMoverComponent)CreateComponent(index, typeof(RandMoverComponent));
         component.speed = newSpeed;
         AddComponent(index, component);
     }
 
-    public void ReplaceRandMove(float newSpeed) {
-        var index = GameComponentsLookup.RandMove;
-        var component = (RandMoveComponent)CreateComponent(index, typeof(RandMoveComponent));
+    public void ReplaceRandMover(UnityEngine.Vector2 newSpeed) {
+        var index = GameComponentsLookup.RandMover;
+        var component = (RandMoverComponent)CreateComponent(index, typeof(RandMoverComponent));
         component.speed = newSpeed;
         ReplaceComponent(index, component);
     }
 
-    public void RemoveRandMove() {
-        RemoveComponent(GameComponentsLookup.RandMove);
+    public void RemoveRandMover() {
+        RemoveComponent(GameComponentsLookup.RandMover);
     }
 }
 
@@ -40,17 +40,17 @@ public partial class GameEntity {
 //------------------------------------------------------------------------------
 public sealed partial class GameMatcher {
 
-    static Entitas.IMatcher<GameEntity> _matcherRandMove;
+    static Entitas.IMatcher<GameEntity> _matcherRandMover;
 
-    public static Entitas.IMatcher<GameEntity> RandMove {
+    public static Entitas.IMatcher<GameEntity> RandMover {
         get {
-            if (_matcherRandMove == null) {
-                var matcher = (Entitas.Matcher<GameEntity>)Entitas.Matcher<GameEntity>.AllOf(GameComponentsLookup.RandMove);
+            if (_matcherRandMover == null) {
+                var matcher = (Entitas.Matcher<GameEntity>)Entitas.Matcher<GameEntity>.AllOf(GameComponentsLookup.RandMover);
                 matcher.componentNames = GameComponentsLookup.componentNames;
-                _matcherRandMove = matcher;
+                _matcherRandMover = matcher;
             }
 
-            return _matcherRandMove;
+            return _matcherRandMover;
         }
     }
 }

@@ -1,31 +1,31 @@
 ﻿using Entitas;
-using System.Collections.Generic;
 using UnityEngine;
 
-internal class RenderInHitSystem : ReactiveSystem<GameEntity>
+internal class RenderInHitSystem : IExecuteSystem
 {
-    public RenderInHitSystem(Contexts contexts) : base(contexts.game)
+    private GameContext _context;
+
+    public RenderInHitSystem(Contexts contexts)
     {
+        _context = contexts.game;
     }
 
-    protected override void Execute(List<GameEntity> entities)
+    public void Execute()
     {
-        foreach (var e in entities)
+        var group = _context.GetGroup(GameMatcher.AllOf(GameMatcher.View)
+            .AnyOf(
+                GameMatcher.CircleHitable,
+                GameMatcher.RectHitable,
+                GameMatcher.CapuleHitable
+            )
+        );
+
+        foreach (var e in group.AsEnumerable())
         {
             var color = e.isInHit ? Color.red : Color.white;
 
             var renderer = e.view.go.GetComponent<Renderer>();
             renderer.material.SetColor("_Color", color);
         }
-    }
-
-    protected override bool Filter(GameEntity entity)
-    {
-        return entity.hasView;
-    }
-
-    protected override ICollector<GameEntity> GetTrigger(IContext<GameEntity> context)
-    {
-        return context.CreateCollector(GameMatcher.InHit);
     }
 }
