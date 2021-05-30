@@ -9,19 +9,30 @@
 public partial class GameContext {
 
     public GameEntity quadtreeEntity { get { return GetGroup(GameMatcher.Quadtree).GetSingleEntity(); } }
+    public QuadtreeComponent quadtree { get { return quadtreeEntity.quadtree; } }
+    public bool hasQuadtree { get { return quadtreeEntity != null; } }
 
-    public bool isQuadtree {
-        get { return quadtreeEntity != null; }
-        set {
-            var entity = quadtreeEntity;
-            if (value != (entity != null)) {
-                if (value) {
-                    CreateEntity().isQuadtree = true;
-                } else {
-                    entity.Destroy();
-                }
-            }
+    public GameEntity SetQuadtree(Quadtree newRoot) {
+        if (hasQuadtree) {
+            throw new Entitas.EntitasException("Could not set Quadtree!\n" + this + " already has an entity with QuadtreeComponent!",
+                "You should check if the context already has a quadtreeEntity before setting it or use context.ReplaceQuadtree().");
         }
+        var entity = CreateEntity();
+        entity.AddQuadtree(newRoot);
+        return entity;
+    }
+
+    public void ReplaceQuadtree(Quadtree newRoot) {
+        var entity = quadtreeEntity;
+        if (entity == null) {
+            entity = SetQuadtree(newRoot);
+        } else {
+            entity.ReplaceQuadtree(newRoot);
+        }
+    }
+
+    public void RemoveQuadtree() {
+        quadtreeEntity.Destroy();
     }
 }
 
@@ -35,25 +46,25 @@ public partial class GameContext {
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    static readonly QuadtreeComponent quadtreeComponent = new QuadtreeComponent();
+    public QuadtreeComponent quadtree { get { return (QuadtreeComponent)GetComponent(GameComponentsLookup.Quadtree); } }
+    public bool hasQuadtree { get { return HasComponent(GameComponentsLookup.Quadtree); } }
 
-    public bool isQuadtree {
-        get { return HasComponent(GameComponentsLookup.Quadtree); }
-        set {
-            if (value != isQuadtree) {
-                var index = GameComponentsLookup.Quadtree;
-                if (value) {
-                    var componentPool = GetComponentPool(index);
-                    var component = componentPool.Count > 0
-                            ? componentPool.Pop()
-                            : quadtreeComponent;
+    public void AddQuadtree(Quadtree newRoot) {
+        var index = GameComponentsLookup.Quadtree;
+        var component = (QuadtreeComponent)CreateComponent(index, typeof(QuadtreeComponent));
+        component.root = newRoot;
+        AddComponent(index, component);
+    }
 
-                    AddComponent(index, component);
-                } else {
-                    RemoveComponent(index);
-                }
-            }
-        }
+    public void ReplaceQuadtree(Quadtree newRoot) {
+        var index = GameComponentsLookup.Quadtree;
+        var component = (QuadtreeComponent)CreateComponent(index, typeof(QuadtreeComponent));
+        component.root = newRoot;
+        ReplaceComponent(index, component);
+    }
+
+    public void RemoveQuadtree() {
+        RemoveComponent(GameComponentsLookup.Quadtree);
     }
 }
 

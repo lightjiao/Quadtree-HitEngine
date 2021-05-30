@@ -26,7 +26,7 @@ internal class DefaultCheckHitSystem : ReactiveSystem<GameEntity>
                 {
                     if (e == c) continue;
 
-                    if (CheckCirclesAndCircles(e, c))
+                    if (UtilityCheckHit.CheckCirclesAndCircles(e, c))
                     {
                         e.isInHit = true;
                     }
@@ -44,21 +44,5 @@ internal class DefaultCheckHitSystem : ReactiveSystem<GameEntity>
     {
         // 只对Position有变化的物体做碰撞检测
         return context.CreateCollector(GameMatcher.Position);
-    }
-
-    private bool CheckCirclesAndCircles(GameEntity a, GameEntity b)
-    {
-        var deltaX = a.position.value.x - b.position.value.x;
-        var deltaY = a.position.value.y - b.position.value.y;
-        var disSqrt = deltaX * deltaX + deltaY * deltaY;
-
-        var radiusSum = a.circleHitable.radius + b.circleHitable.radius;
-        return disSqrt < (radiusSum * radiusSum);
-    }
-
-    private bool CheckCapsuleAndCapsule(GameEntity a, GameEntity b)
-    {
-        // TODO:
-        return false;
     }
 }

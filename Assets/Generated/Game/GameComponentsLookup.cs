@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 public static class GameComponentsLookup {
 
-    public const int AxisAlignedBoundingBox = 0;
+    public const int AABB = 0;
     public const int Background = 1;
     public const int CapuleHitable = 2;
     public const int CircleHitable = 3;
@@ -23,7 +23,7 @@ public static class GameComponentsLookup {
     public const int TotalComponents = 11;
 
     public static readonly string[] componentNames = {
-        "AxisAlignedBoundingBox",
+        "AABB",
         "Background",
         "CapuleHitable",
         "CircleHitable",
@@ -37,7 +37,7 @@ public static class GameComponentsLookup {
     };
 
     public static readonly System.Type[] componentTypes = {
-        typeof(AxisAlignedBoundingBoxComponent),
+        typeof(AABB),
         typeof(BackgroundComponent),
         typeof(CapuleHitableComponent),
         typeof(CircleHitableComponent),
