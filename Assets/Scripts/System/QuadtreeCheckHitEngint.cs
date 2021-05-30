@@ -80,10 +80,10 @@ internal class QuadtreeCheckHitEngint : ReactiveSystem<GameEntity>, IInitializeS
 
         var root = new Quadtree(new AsixAligendBoundingBox
         {
-            Left = background.left,
-            Right = background.right,
-            Top = background.top,
-            Bottom = background.bottom
+            Left = background.left - Quadtree.m_LooseSpacing,
+            Right = background.right + Quadtree.m_LooseSpacing,
+            Top = background.top + Quadtree.m_LooseSpacing,
+            Bottom = background.bottom - Quadtree.m_LooseSpacing
         });
 
         _context.SetQuadtree(root);

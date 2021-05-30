@@ -36,7 +36,7 @@ public class Quadtree
     public static Dictionary<GameEntity, Quadtree> NodeLookup = new Dictionary<GameEntity, Quadtree>();
 
     /// 空间划分时的稀疏范围
-    private const float m_LooseSpacing = 10f;
+    public const float m_LooseSpacing = 10f;
 
     private const int MaxDepth = 3;
 
