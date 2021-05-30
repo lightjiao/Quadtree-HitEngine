@@ -40,6 +40,7 @@ internal class QuadtreeCheckHitEngint : ReactiveSystem<GameEntity>, IInitializeS
             {
                 var node = stack.Pop();
                 if (node == null) continue;
+                if (false == IsInAABB(e.aABB.box, node.BoundBox)) continue;
 
                 stack.Push(node.LeftTop);
                 stack.Push(node.RightTop);
