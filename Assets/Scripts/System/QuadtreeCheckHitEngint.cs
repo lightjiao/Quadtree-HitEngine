@@ -30,15 +30,30 @@ internal class QuadtreeCheckHitEngint : ReactiveSystem<GameEntity>, IInitializeS
             RefreshAABB(e);
             UpdateEntityInTree(quadtreeRoot, e);
 
-            // 遍历树，检查是否碰撞
-            var node = Quadtree.NodeLookup[e];
-            foreach (var e2 in node.hitableEntities)
+            /**
+             * 遍历树，检查是否碰撞
+             * 要从树的根部开始遍历，因为有一些比较大的对象跨越了多个区域的时候会挂在中间的某个树节点
+             */
+            var stack = new Stack<Quadtree>();
+            stack.Push(quadtreeRoot);
+            while (stack.Count > 0)
             {
-                if (e == e2) continue;
-                if (CheckHit(e, e2))
+                var node = stack.Pop();
+                if (node == null) continue;
+
+                stack.Push(node.LeftTop);
+                stack.Push(node.RightTop);
+                stack.Push(node.LeftBottom);
+                stack.Push(node.RightBottom);
+
+                foreach (var e2 in node.hitableEntities)
                 {
-                    e.isInHit = true;
-                    e2.isInHit = true;
+                    if (e == e2) continue;
+                    if (CheckHit(e, e2))
+                    {
+                        e.isInHit = true;
+                        e2.isInHit = true;
+                    }
                 }
             }
         }
@@ -70,7 +85,7 @@ internal class QuadtreeCheckHitEngint : ReactiveSystem<GameEntity>, IInitializeS
             Bottom = background.bottom
         });
 
-        _context.quadtree.root = root;
+        _context.SetQuadtree(root);
     }
 
     private void RefreshAABB(GameEntity entity)
