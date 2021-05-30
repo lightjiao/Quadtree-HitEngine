@@ -28,7 +28,7 @@ internal class QuadtreeCheckHitEngint : ReactiveSystem<GameEntity>, IInitializeS
         foreach (var e in entities)
         {
             RefreshAABB(e);
-            UpdateEntityInTree(quadtreeRoot, e);
+            UpdateEntityInTree(e);
 
             /**
              * 遍历树，检查是否碰撞
@@ -106,6 +106,19 @@ internal class QuadtreeCheckHitEngint : ReactiveSystem<GameEntity>, IInitializeS
         /// Replaces an existing component at the specified index
         /// or adds it if it doesn't exist yet.
         entity.ReplaceAABB(aabb);
+    }
+
+    private void UpdateEntityInTree(GameEntity e)
+    {
+        if (Quadtree.NodeLookup.TryGetValue(e, out var node))
+        {
+            if (UpdateEntityInTree(node, e))
+            {
+                return;
+            }
+        }
+
+        UpdateEntityInTree(_context.quadtree.root, e);
     }
 
     /// <summary>
