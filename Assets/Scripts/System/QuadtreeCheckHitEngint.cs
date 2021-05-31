@@ -33,10 +33,8 @@ internal class QuadtreeCheckHitEngint : ReactiveSystem<GameEntity>, IInitializeS
         var quadtreeRoot = _context.quadtree.root;
         foreach (var e in entities)
         {
-            /**
-             * 遍历树，检查是否碰撞
-             * 要从树的根部开始遍历，因为有一些比较大的对象跨越了多个区域的时候会挂在中间的某个树节点
-             */
+            // 遍历树，检查是否碰撞
+            // 要从树的根部开始遍历，因为有一些比较大的对象跨越了多个区域的时候会挂在中间的某个树节点
             var stack = new Stack<Quadtree>();
             stack.Push(quadtreeRoot);
             while (stack.Count > 0)
@@ -106,8 +104,8 @@ internal class QuadtreeCheckHitEngint : ReactiveSystem<GameEntity>, IInitializeS
             aabb.Bottom = pos.y - radius;
         }
 
-        /// Replaces an existing component at the specified index
-        /// or adds it if it doesn't exist yet.
+        // Replaces an existing component at the specified index
+        // or adds it if it doesn't exist yet.
         entity.ReplaceAABB(aabb);
     }
 
@@ -124,10 +122,6 @@ internal class QuadtreeCheckHitEngint : ReactiveSystem<GameEntity>, IInitializeS
         UpdateEntityInTree(_context.quadtree.root, e);
     }
 
-    /// <summary>
-    /// 只有位置有变更的entity才会执行到这里
-    /// </summary>
-    /// <param name="entity"></param>
     private bool UpdateEntityInTree(Quadtree node, GameEntity entity)
     {
         if (node == null) return false;
