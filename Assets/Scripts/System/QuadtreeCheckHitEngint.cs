@@ -24,12 +24,15 @@ internal class QuadtreeCheckHitEngint : ReactiveSystem<GameEntity>, IInitializeS
             e.isInHit = false;
         }
 
+        foreach (var e in entities)
+        { 
+            RefreshAABB(e); 
+            UpdateEntityInTree(e);   
+        }
+
         var quadtreeRoot = _context.quadtree.root;
         foreach (var e in entities)
         {
-            RefreshAABB(e);
-            UpdateEntityInTree(e);
-
             /**
              * 遍历树，检查是否碰撞
              * 要从树的根部开始遍历，因为有一些比较大的对象跨越了多个区域的时候会挂在中间的某个树节点
