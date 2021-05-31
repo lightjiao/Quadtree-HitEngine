@@ -15,7 +15,7 @@ public class InitSystem : IInitializeSystem
 
     public void Initialize()
     {
-        for (var i = 0; i < 1000; i++)
+        for (var i = 0; i < 500; i++)
         {
             var circleEntity = _context.CreateEntity();
             circleEntity.isNeedView = true;
