@@ -1,11 +1,11 @@
 ﻿using Entitas;
 using System.Collections.Generic;
 
-internal class QuadtreeCheckHitEngint : ReactiveSystem<GameEntity>, IInitializeSystem
+internal class QuadtreeCheckHitEngine : ReactiveSystem<GameEntity>, IInitializeSystem
 {
     private readonly GameContext _context;
 
-    public QuadtreeCheckHitEngint(Contexts contexts) : base(contexts.game)
+    public QuadtreeCheckHitEngine(Contexts contexts) : base(contexts.game)
     {
         _context = contexts.game;
     }
