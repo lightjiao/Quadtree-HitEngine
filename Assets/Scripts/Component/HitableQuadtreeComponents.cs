@@ -2,21 +2,6 @@ using Entitas;
 using Entitas.CodeGeneration.Attributes;
 using System.Collections.Generic;
 
-[Game]
-public class AABB : IComponent
-{
-    public AsixAligendBoundingBox box;
-}
-
-/// <summary>
-/// 保存碰撞对象的四叉树
-/// </summary>
-[Game, Unique]
-public class QuadtreeComponent : IComponent
-{
-    public Quadtree root;
-}
-
 /// <summary>
 /// 轴对齐矩形框
 /// 用于空间划分，或者包裹一个碰撞体
@@ -29,6 +14,40 @@ public struct AsixAligendBoundingBox
     public float Bottom;
     public float MiddleHeight => (Top + Bottom) / 2;
     public float MiddleLength => (Left + Right) / 2;
+}
+
+[Game]
+public class AABB : IComponent
+{
+    public AsixAligendBoundingBox box;
+}
+
+/// <summary>
+/// 四叉树可以用一维数组表示，Entity包含这个Component后
+/// 表示Entity在四叉树的哪一个节点中
+/// </summary>
+[Game]
+public class InQuadtreeIdxComponent : IComponent
+{
+    public int index;
+}
+
+// 还是需要一个树来保存四叉树每个节点的大小范围
+// --> 碰撞裁剪
+// --> 
+public class QuadtreeNode : IComponent
+{
+    public int index; // --> 根据index计算parent与child
+    public AsixAligendBoundingBox boundBox; // --> 空间
+}
+
+/// <summary>
+/// 保存碰撞对象的四叉树
+/// </summary>
+[Game, Unique]
+public class QuadtreeComponent : IComponent
+{
+    public Quadtree root;
 }
 
 public class Quadtree

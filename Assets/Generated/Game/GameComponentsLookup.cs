@@ -13,14 +13,16 @@ public static class GameComponentsLookup {
     public const int CapuleHitable = 2;
     public const int CircleHitable = 3;
     public const int InHit = 4;
-    public const int NeedView = 5;
-    public const int Position = 6;
-    public const int Quadtree = 7;
-    public const int RandMover = 8;
-    public const int RectHitable = 9;
-    public const int View = 10;
+    public const int InQuadtreeIdx = 5;
+    public const int NeedView = 6;
+    public const int Position = 7;
+    public const int Quadtree = 8;
+    public const int QuadtreeNode = 9;
+    public const int RandMover = 10;
+    public const int RectHitable = 11;
+    public const int View = 12;
 
-    public const int TotalComponents = 11;
+    public const int TotalComponents = 13;
 
     public static readonly string[] componentNames = {
         "AABB",
@@ -28,9 +30,11 @@ public static class GameComponentsLookup {
         "CapuleHitable",
         "CircleHitable",
         "InHit",
+        "InQuadtreeIdx",
         "NeedView",
         "Position",
         "Quadtree",
+        "QuadtreeNode",
         "RandMover",
         "RectHitable",
         "View"
@@ -42,9 +46,11 @@ public static class GameComponentsLookup {
         typeof(CapuleHitableComponent),
         typeof(CircleHitableComponent),
         typeof(InHitComponent),
+        typeof(InQuadtreeIdxComponent),
         typeof(NeedViewComponent),
         typeof(PositionComponent),
         typeof(QuadtreeComponent),
+        typeof(QuadtreeNode),
         typeof(RandMoverComponent),
         typeof(RectHitableComponent),
         typeof(ViewComponent)
