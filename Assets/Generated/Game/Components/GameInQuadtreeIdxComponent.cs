@@ -11,17 +11,17 @@ public partial class GameEntity {
     public InQuadtreeIdxComponent inQuadtreeIdx { get { return (InQuadtreeIdxComponent)GetComponent(GameComponentsLookup.InQuadtreeIdx); } }
     public bool hasInQuadtreeIdx { get { return HasComponent(GameComponentsLookup.InQuadtreeIdx); } }
 
-    public void AddInQuadtreeIdx(int newIndex) {
+    public void AddInQuadtreeIdx(int newValue) {
         var index = GameComponentsLookup.InQuadtreeIdx;
         var component = (InQuadtreeIdxComponent)CreateComponent(index, typeof(InQuadtreeIdxComponent));
-        component.index = newIndex;
+        component.value = newValue;
         AddComponent(index, component);
     }
 
-    public void ReplaceInQuadtreeIdx(int newIndex) {
+    public void ReplaceInQuadtreeIdx(int newValue) {
         var index = GameComponentsLookup.InQuadtreeIdx;
         var component = (InQuadtreeIdxComponent)CreateComponent(index, typeof(InQuadtreeIdxComponent));
-        component.index = newIndex;
+        component.value = newValue;
         ReplaceComponent(index, component);
     }
 

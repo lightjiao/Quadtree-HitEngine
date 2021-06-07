@@ -22,6 +22,7 @@ public class InitSystem : IInitializeSystem
             circleEntity.AddPosition(new Vector2(Random.Range(-10, 10), Random.Range(-10, 10)));
             circleEntity.AddCircleHitable(Random.Range(1, 3));
             circleEntity.AddRandMover(new Vector2(Random.Range(-10f, 10f), Random.Range(-10f, 10f)));
+            circleEntity.AddInQuadtreeIdx(-1);
 
             //var rectEntity = _context.CreateEntity();
             //rectEntity.isNeedView = true;
