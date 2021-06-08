@@ -30,11 +30,21 @@ namespace HitEngine.Entities
         public int value;
     }
 
-    /// <summary>
-    /// singleton，一维数组表示的四叉树的空间
-    /// </summary>
-    public struct QuadtreeArrayComponent : IComponentData
+    public struct QuadtreeRootTag : IComponentData
     {
-        //public AsixAligendBoundingBox[] value;
+    }
+
+    public struct QuadtreeNodeComponent : IComponentData
+    {
+        public int index;
+        public AsixAligendBoundingBox box;
+    }
+
+    public struct QuadtreeChildContainerComponent : IComponentData
+    {
+        public Entity leftTop;
+        public Entity rightTop;
+        public Entity leftBottom;
+        public Entity rightBottom;
     }
 }
