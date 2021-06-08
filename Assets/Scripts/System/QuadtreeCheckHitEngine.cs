@@ -231,11 +231,9 @@ internal class QuadtreeCheckHitEngine : ReactiveSystem<GameEntity>, IInitializeS
 
     private bool UpdateEntityInTree(GameEntity quadtreeNode, GameEntity entity)
     {
-        if (quadtreeNode == null) return false;
-
         var nodeIdx = quadtreeNode.quadtreeNode.index;
         var nodeBox = quadtreeNode.quadtreeNode.box;
-        if (nodeIdx != 0 && IsInAABB(entity.aABB.box, nodeBox))
+        if (nodeIdx != 0 && !IsInAABB(entity.aABB.box, nodeBox))
         {
             return false;
         }
