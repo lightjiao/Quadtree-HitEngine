@@ -64,6 +64,7 @@ namespace HitEngine.Entities
                 EntityManager.AddComponentData(entity, new CircleHitableComponent { radius = random.NextFloat(1, 3) });
                 EntityManager.AddComponentData(entity, new IsInHitComponent { value = false });
                 EntityManager.AddComponentData(entity, new InQuadtreeIdxComponent { value = -1 });
+                EntityManager.AddComponentData(entity, new AABB());
 
                 var randSpeed = new float2(random.NextFloat(-10, 10), random.NextFloat(-10, 10));
                 EntityManager.AddComponentData(entity, new MoverBySpeedComponent { speed = randSpeed }); ;

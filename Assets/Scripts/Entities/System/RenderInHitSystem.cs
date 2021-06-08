@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace HitEngine.Entities
 {
+    [UpdateAfter(typeof(QuadtreeCheckHitSystem))]
     public class RenderInHitSystem : SystemBase
     {
         protected override void OnUpdate()

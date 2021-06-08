@@ -62,7 +62,8 @@ namespace HitEngine.Entities
                 {
                     var quadTreeNode = stack.Pop();
 
-                    var nodeAabb = EntityManager.GetComponentData<AABB>(quadTreeNode).value;
+                    var index = EntityManager.GetComponentData<QuadtreeNodeComponent>(quadTreeNode).index;
+                    var nodeAabb = EntityManager.GetComponentData<QuadtreeNodeComponent>(quadTreeNode).box;
                     if (false == IsInBox(aabb.value, nodeAabb)) continue;
 
                     if (EntityManager.HasComponent<QuadtreeChildContainerComponent>(quadTreeNode))
@@ -74,7 +75,7 @@ namespace HitEngine.Entities
                         stack.Push(child.rightBottom);
                     }
 
-                    var index = EntityManager.GetComponentData<QuadtreeNodeComponent>(quadTreeNode).index;
+                    
                     foreach (var e2 in hitableEntities.ToEntityArray(Allocator.Temp))
                     {
                         var e2QuadTreeIdx = EntityManager.GetComponentData<InQuadtreeIdxComponent>(e2).value;
