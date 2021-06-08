@@ -1,12 +1,16 @@
 ﻿using Entitas;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 internal class QuadtreeCheckHitEngine : ReactiveSystem<GameEntity>, IInitializeSystem
 {
-    private const float m_LooseSpacing = 5;
+    private const float m_LooseSpacing = 2;
 
     private readonly GameContext _context;
+
+    private IGroup<GameEntity> m_QuadtreeNodes;
+    private GameEntity m_QuadtreeRoot;
 
     public QuadtreeCheckHitEngine(Contexts contexts) : base(contexts.game)
     {
@@ -21,13 +25,16 @@ internal class QuadtreeCheckHitEngine : ReactiveSystem<GameEntity>, IInitializeS
     protected override void Execute(List<GameEntity> entities)
     {
         // 所有的对象isInHit 设置为false
-        var group = _context.GetGroup(
+        var hitAbleGroup = _context.GetGroup(
             GameMatcher.AnyOf(GameMatcher.CircleHitable, GameMatcher.RectHitable, GameMatcher.CapuleHitable)
         );
-        foreach (var e in group.AsEnumerable())
+        foreach (var e in hitAbleGroup.AsEnumerable())
         {
             e.isInHit = false;
         }
+
+        m_QuadtreeNodes = _context.GetGroup(GameMatcher.QuadtreeNode);
+        m_QuadtreeRoot = _context.GetEntities(GameMatcher.QuadtreeRootTag)[0];
 
         foreach (var e in entities)
         {
@@ -39,25 +46,28 @@ internal class QuadtreeCheckHitEngine : ReactiveSystem<GameEntity>, IInitializeS
         {
             // 遍历树，检查是否碰撞
             // 要从树的根部开始遍历，因为有一些比较大的对象跨越了多个区域的时候会挂在中间的某个树节点
-            var stack = new Stack<int>();
-            stack.Push(0);
+            var stack = new Stack<GameEntity>();
+            stack.Push(m_QuadtreeRoot);
             while (stack.Count > 0)
             {
-                var idx = stack.Pop();
-                if (idx < 0 || idx >= _context.quadtreeArray.array.Length) continue;
-
-                var aabb = _context.quadtreeArray.array[idx];
+                var quadTreeNode = stack.Pop();
+                var aabb = quadTreeNode.quadtreeNode.box;
+                var index = quadTreeNode.quadtreeNode.index;
                 if (false == IsInAABB(e.aABB.box, aabb)) continue;
-
+            
                 // 子节点下标为 4(i+1)-3, 4(i+1)-2, 4(i+1)-1, 4(i+1)-0
-                stack.Push(4 * (idx + 1) - 3);
-                stack.Push(4 * (idx + 1) - 2);
-                stack.Push(4 * (idx + 1) - 1);
-                stack.Push(4 * (idx + 1) - 0);
-
-                foreach (var e2 in group.AsEnumerable())
+                if (quadTreeNode.hasQuadtreeChildContainer)
                 {
-                    if (e2.inQuadtreeIdx.value != idx) continue;
+                    var child = quadTreeNode.quadtreeChildContainer;
+                    stack.Push(child.leftTop);
+                    stack.Push(child.rightTop);
+                    stack.Push(child.leftBottom);
+                    stack.Push(child.rightBottom);
+                }
+            
+                foreach (var e2 in hitAbleGroup.AsEnumerable())
+                {
+                    if (e2.inQuadtreeIdx.value != index) continue;
                     if (e == e2) continue;
                     if (CheckHit(e, e2))
                     {
@@ -110,57 +120,78 @@ internal class QuadtreeCheckHitEngine : ReactiveSystem<GameEntity>, IInitializeS
         }
 
         // 用数组表示四叉树
-        var quadtreeAABBArray = new AsixAligendBoundingBox[nodeSum];
+        var entityArray = new GameEntity[nodeSum];
+        var rootBox = new AsixAligendBoundingBox();
         for (var i = 0; i < nodeSum; i++)
         {
+            var entity = _context.CreateEntity();
             var aabb = new AsixAligendBoundingBox();
 
             if (i == 0)
             {
+                entity.isQuadtreeRootTag = true;
+
                 var background = _context.background;
                 aabb.Left = background.left - m_LooseSpacing;
                 aabb.Right = background.right + m_LooseSpacing;
                 aabb.Top = background.top + m_LooseSpacing;
                 aabb.Bottom = background.bottom - m_LooseSpacing;
+                rootBox = aabb;
             }
             else
             {
-                var parentAABB = quadtreeAABBArray[(i - 1) / 4];
+                var parentAABB = entityArray[(i - 1) / 4].quadtreeNode.box;
                 var curNodeIdx = i % 4;
-                // 1、2、3、4 分别代表 左上、右上、左下、右下
+                // 1、2、3、0 分别代表 左上、右上、左下、右下
                 switch (curNodeIdx)
                 {
                     case 1:
-                        aabb.Left = parentAABB.Left;
+                        aabb.Left = Mathf.Max(parentAABB.Left - m_LooseSpacing, rootBox.Left);
                         aabb.Right = parentAABB.MiddleLength + m_LooseSpacing;
-                        aabb.Top = parentAABB.Top + m_LooseSpacing;
+                        aabb.Top = Mathf.Min(parentAABB.Top + m_LooseSpacing, rootBox.Top);
                         aabb.Bottom = parentAABB.MiddleHeight - m_LooseSpacing;
                         break;
                     case 2:
                         aabb.Left = parentAABB.MiddleLength - m_LooseSpacing;
-                        aabb.Right = parentAABB.Right;
-                        aabb.Top = parentAABB.Top;
+                        aabb.Right = Mathf.Min(parentAABB.Right + m_LooseSpacing, rootBox.Right);
+                        aabb.Top = Mathf.Min(parentAABB.Top + m_LooseSpacing, rootBox.Top);
                         aabb.Bottom = parentAABB.MiddleHeight - m_LooseSpacing;
                         break;
                     case 3:
-                        aabb.Left = parentAABB.Left;
+                        aabb.Left = Mathf.Max(parentAABB.Left - m_LooseSpacing, rootBox.Left);;
                         aabb.Right = parentAABB.MiddleLength + m_LooseSpacing;
                         aabb.Top = parentAABB.MiddleHeight + m_LooseSpacing;
-                        aabb.Bottom = parentAABB.Bottom;
+                        aabb.Bottom = Mathf.Max(parentAABB.Bottom - m_LooseSpacing, rootBox.Bottom);
                         break;
-                    case 4:
+                    case 0:
                         aabb.Left = parentAABB.MiddleLength - m_LooseSpacing;
-                        aabb.Right = parentAABB.Right;
+                        aabb.Right = Mathf.Min(parentAABB.Right + m_LooseSpacing, rootBox.Right);
                         aabb.Top = parentAABB.MiddleHeight + m_LooseSpacing;
-                        aabb.Bottom = parentAABB.Bottom;
+                        aabb.Bottom = Mathf.Max(parentAABB.Bottom - m_LooseSpacing, rootBox.Bottom);
                         break;
                 }
             }
 
-            quadtreeAABBArray[i] = aabb;
+            entity.AddQuadtreeNode(i, aabb);
+            entityArray[i] = entity;
         }
 
-        _context.SetQuadtreeArray(quadtreeAABBArray);
+        // 关联子节点信息
+        for (var i = 0; i < nodeSum; i++)
+        {
+            var entity = entityArray[i];
+
+            // 子节点下标为 4(i+1)-3, 4(i+1)-2, 4(i+1)-1, 4(i+1)-0
+            // 同时要注意边界
+            if (4 * (i + 1) - 3 >= nodeSum) continue;
+            
+            entity.AddQuadtreeChildContainer(
+                entityArray[4 * (i + 1) - 3],
+                entityArray[4 * (i + 1) - 2],
+                entityArray[4 * (i + 1) - 1],
+                entityArray[4 * (i + 1) - 0]
+            );
+        }
     }
 
     private void RefreshAABB(GameEntity entity)
@@ -185,46 +216,44 @@ internal class QuadtreeCheckHitEngine : ReactiveSystem<GameEntity>, IInitializeS
     private void UpdateEntityInTree(GameEntity e)
     {
         // 跨越了节点的情况是少数，所以先判断是否还在原来的节点空间中
-        if (e.inQuadtreeIdx.value >= 0)
+        var inQuadTreeIdx = e.inQuadtreeIdx.value;
+        if (inQuadTreeIdx >= 0)
         {
-            if (UpdateEntityInTree(e.inQuadtreeIdx.value, e))
+            var curNode = m_QuadtreeNodes.AsEnumerable().First(x => x.quadtreeNode.index == inQuadTreeIdx);
+            if (UpdateEntityInTree(curNode, e))
             {
                 return;
             }
         }
 
-        UpdateEntityInTree(0, e);
+        UpdateEntityInTree(m_QuadtreeRoot, e);
     }
 
-    private bool UpdateEntityInTree(int treeIdx, GameEntity entity)
+    private bool UpdateEntityInTree(GameEntity quadtreeNode, GameEntity entity)
     {
-        var treeArray = _context.quadtreeArray.array;
+        if (quadtreeNode == null) return false;
 
-        if (treeIdx < 0 || treeIdx >= treeArray.Length)
-        {
-            return false;
-        }
-
-        // 判断是否在当前节点（所有物体一定都在根节点）
-        var aabb = treeArray[treeIdx];
-        if (treeIdx != 0 && IsInAABB(entity.aABB.box, aabb))
+        var nodeIdx = quadtreeNode.quadtreeNode.index;
+        var nodeBox = quadtreeNode.quadtreeNode.box;
+        if (nodeIdx != 0 && IsInAABB(entity.aABB.box, nodeBox))
         {
             return false;
         }
 
         // 检查并更新到子节点
-        // 节点下标为 4(i+1)-3, 4(i+1)-2, 4(i+1)-1, 4(i+1)-0
-        var isInChild = false;
-        for (var i = 0; i < 4; i++)
+        if (quadtreeNode.hasQuadtreeChildContainer)
         {
-            isInChild = isInChild || UpdateEntityInTree(4 * (treeIdx + 1) - i, entity);
+            var children = quadtreeNode.quadtreeChildContainer;
+            var isInChild = UpdateEntityInTree(children.leftTop, entity)
+                            || UpdateEntityInTree(children.rightTop, entity)
+                            || UpdateEntityInTree(children.leftBottom, entity)
+                            || UpdateEntityInTree(children.rightBottom, entity);
+            if (isInChild) return true;    
         }
 
-        if (isInChild) return true;
+        entity.ReplaceInQuadtreeIdx(nodeIdx);
 
-        entity.inQuadtreeIdx.value = treeIdx;
-
-        return false;
+        return true;
     }
 
     private bool CheckHit(GameEntity a, GameEntity b)
