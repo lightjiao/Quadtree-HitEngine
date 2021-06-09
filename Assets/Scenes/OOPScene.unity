@@ -486,3 +486,4 @@ MonoBehaviour:
   BackgroundLength: 100
   depth: 1
   m_LooseSpacing: 5
+  m_AllColliders: []

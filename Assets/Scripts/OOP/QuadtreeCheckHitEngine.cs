@@ -140,12 +140,10 @@ namespace HitEngine.OOP
         {
             foreach (var myCollider in m_AllColliders)
             {
-                if (UpdateQuadtree(myCollider.inQuadTreeIndex, myCollider))
+                if (false == UpdateQuadtree(myCollider.inQuadTreeIndex, myCollider))
                 {
-                    return;
+                    UpdateQuadtree(0, myCollider);    
                 }
-
-                UpdateQuadtree(0, myCollider);
             }
         }
 
