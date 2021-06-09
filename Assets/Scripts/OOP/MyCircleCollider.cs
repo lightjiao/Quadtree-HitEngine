@@ -38,7 +38,7 @@ namespace HitEngine.OOP
 
         public void FlushHitStatus()
         {
-            var color = m_IsInHit ? Color.red : Color.white;
+            var color = m_IsInHit ? Color.red : Color.green;
             _renderer.material.SetColor("_Color", color);
         }
 
