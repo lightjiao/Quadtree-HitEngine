@@ -38,6 +38,7 @@ namespace HitEngine.OOP
         [SerializeField] private int depth = 3;
         [SerializeField] private float m_LooseSpacing = 5f;
 
+        [SerializeField]
         private List<MyCircleCollider> m_AllColliders = new List<MyCircleCollider>();
         private QuadtreeNode[] m_Quadtree;
 
@@ -70,7 +71,7 @@ namespace HitEngine.OOP
         private void InitQuadtree()
         {
             var nodeSum = 0;
-            for (var i = 0; i <= depth; i++)
+            for (var i = 0; i < depth; i++)
             {
                 nodeSum += (int)Mathf.Pow(4, i);
             }
