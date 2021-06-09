@@ -7,6 +7,7 @@ using Unity.Mathematics;
 
 namespace HitEngine.Entities
 {
+    [DisableAutoCreation]
     public class QuadtreeCheckHitSystem : SystemBase
     {
         private const float m_LooseSpacing = 5;

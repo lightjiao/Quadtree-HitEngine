@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace HitEngine.Entities
 {
+    [DisableAutoCreation]
     [UpdateAfter(typeof(QuadtreeCheckHitSystem))]
     public class RenderInHitSystem : SystemBase
     {

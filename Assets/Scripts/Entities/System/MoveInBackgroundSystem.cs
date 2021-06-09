@@ -4,6 +4,7 @@ using Unity.Transforms;
 
 namespace HitEngine.Entities
 {
+    [DisableAutoCreation]
     [UpdateBefore(typeof(QuadtreeCheckHitSystem))]
     internal class MoveInBackgroundSystem : SystemBase
     {

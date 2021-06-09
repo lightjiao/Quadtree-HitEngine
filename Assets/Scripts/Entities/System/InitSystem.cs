@@ -9,6 +9,7 @@ using Unity.Rendering;
 
 namespace HitEngine.Entities
 {
+    [DisableAutoCreation]
     public class InitSystem : SystemBase
     {
         // 背景的长宽
