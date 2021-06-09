@@ -8,19 +8,19 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    public RandMoverComponent randMover { get { return (RandMoverComponent)GetComponent(GameComponentsLookup.RandMover); } }
+    public HitEngine.Entitas.RandMoverComponent randMover { get { return (HitEngine.Entitas.RandMoverComponent)GetComponent(GameComponentsLookup.RandMover); } }
     public bool hasRandMover { get { return HasComponent(GameComponentsLookup.RandMover); } }
 
     public void AddRandMover(UnityEngine.Vector2 newSpeed) {
         var index = GameComponentsLookup.RandMover;
-        var component = (RandMoverComponent)CreateComponent(index, typeof(RandMoverComponent));
+        var component = (HitEngine.Entitas.RandMoverComponent)CreateComponent(index, typeof(HitEngine.Entitas.RandMoverComponent));
         component.speed = newSpeed;
         AddComponent(index, component);
     }
 
     public void ReplaceRandMover(UnityEngine.Vector2 newSpeed) {
         var index = GameComponentsLookup.RandMover;
-        var component = (RandMoverComponent)CreateComponent(index, typeof(RandMoverComponent));
+        var component = (HitEngine.Entitas.RandMoverComponent)CreateComponent(index, typeof(HitEngine.Entitas.RandMoverComponent));
         component.speed = newSpeed;
         ReplaceComponent(index, component);
     }

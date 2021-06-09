@@ -8,19 +8,19 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    public CircleHitableComponent circleHitable { get { return (CircleHitableComponent)GetComponent(GameComponentsLookup.CircleHitable); } }
+    public HitEngine.Entitas.CircleHitableComponent circleHitable { get { return (HitEngine.Entitas.CircleHitableComponent)GetComponent(GameComponentsLookup.CircleHitable); } }
     public bool hasCircleHitable { get { return HasComponent(GameComponentsLookup.CircleHitable); } }
 
     public void AddCircleHitable(float newRadius) {
         var index = GameComponentsLookup.CircleHitable;
-        var component = (CircleHitableComponent)CreateComponent(index, typeof(CircleHitableComponent));
+        var component = (HitEngine.Entitas.CircleHitableComponent)CreateComponent(index, typeof(HitEngine.Entitas.CircleHitableComponent));
         component.radius = newRadius;
         AddComponent(index, component);
     }
 
     public void ReplaceCircleHitable(float newRadius) {
         var index = GameComponentsLookup.CircleHitable;
-        var component = (CircleHitableComponent)CreateComponent(index, typeof(CircleHitableComponent));
+        var component = (HitEngine.Entitas.CircleHitableComponent)CreateComponent(index, typeof(HitEngine.Entitas.CircleHitableComponent));
         component.radius = newRadius;
         ReplaceComponent(index, component);
     }

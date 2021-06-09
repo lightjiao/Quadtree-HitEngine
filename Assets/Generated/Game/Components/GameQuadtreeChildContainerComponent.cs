@@ -8,12 +8,12 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    public QuadtreeChildContainerComponent quadtreeChildContainer { get { return (QuadtreeChildContainerComponent)GetComponent(GameComponentsLookup.QuadtreeChildContainer); } }
+    public HitEngine.Entitas.QuadtreeChildContainerComponent quadtreeChildContainer { get { return (HitEngine.Entitas.QuadtreeChildContainerComponent)GetComponent(GameComponentsLookup.QuadtreeChildContainer); } }
     public bool hasQuadtreeChildContainer { get { return HasComponent(GameComponentsLookup.QuadtreeChildContainer); } }
 
     public void AddQuadtreeChildContainer(GameEntity newLeftTop, GameEntity newRightTop, GameEntity newLeftBottom, GameEntity newRightBottom) {
         var index = GameComponentsLookup.QuadtreeChildContainer;
-        var component = (QuadtreeChildContainerComponent)CreateComponent(index, typeof(QuadtreeChildContainerComponent));
+        var component = (HitEngine.Entitas.QuadtreeChildContainerComponent)CreateComponent(index, typeof(HitEngine.Entitas.QuadtreeChildContainerComponent));
         component.leftTop = newLeftTop;
         component.rightTop = newRightTop;
         component.leftBottom = newLeftBottom;
@@ -23,7 +23,7 @@ public partial class GameEntity {
 
     public void ReplaceQuadtreeChildContainer(GameEntity newLeftTop, GameEntity newRightTop, GameEntity newLeftBottom, GameEntity newRightBottom) {
         var index = GameComponentsLookup.QuadtreeChildContainer;
-        var component = (QuadtreeChildContainerComponent)CreateComponent(index, typeof(QuadtreeChildContainerComponent));
+        var component = (HitEngine.Entitas.QuadtreeChildContainerComponent)CreateComponent(index, typeof(HitEngine.Entitas.QuadtreeChildContainerComponent));
         component.leftTop = newLeftTop;
         component.rightTop = newRightTop;
         component.leftBottom = newLeftBottom;

@@ -8,12 +8,12 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    public RectHitableComponent rectHitable { get { return (RectHitableComponent)GetComponent(GameComponentsLookup.RectHitable); } }
+    public HitEngine.Entitas.RectHitableComponent rectHitable { get { return (HitEngine.Entitas.RectHitableComponent)GetComponent(GameComponentsLookup.RectHitable); } }
     public bool hasRectHitable { get { return HasComponent(GameComponentsLookup.RectHitable); } }
 
     public void AddRectHitable(float newHeight, float newLength) {
         var index = GameComponentsLookup.RectHitable;
-        var component = (RectHitableComponent)CreateComponent(index, typeof(RectHitableComponent));
+        var component = (HitEngine.Entitas.RectHitableComponent)CreateComponent(index, typeof(HitEngine.Entitas.RectHitableComponent));
         component.height = newHeight;
         component.length = newLength;
         AddComponent(index, component);
@@ -21,7 +21,7 @@ public partial class GameEntity {
 
     public void ReplaceRectHitable(float newHeight, float newLength) {
         var index = GameComponentsLookup.RectHitable;
-        var component = (RectHitableComponent)CreateComponent(index, typeof(RectHitableComponent));
+        var component = (HitEngine.Entitas.RectHitableComponent)CreateComponent(index, typeof(HitEngine.Entitas.RectHitableComponent));
         component.height = newHeight;
         component.length = newLength;
         ReplaceComponent(index, component);

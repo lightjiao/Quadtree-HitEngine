@@ -8,19 +8,19 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    public PositionComponent position { get { return (PositionComponent)GetComponent(GameComponentsLookup.Position); } }
+    public HitEngine.Entitas.PositionComponent position { get { return (HitEngine.Entitas.PositionComponent)GetComponent(GameComponentsLookup.Position); } }
     public bool hasPosition { get { return HasComponent(GameComponentsLookup.Position); } }
 
     public void AddPosition(UnityEngine.Vector2 newValue) {
         var index = GameComponentsLookup.Position;
-        var component = (PositionComponent)CreateComponent(index, typeof(PositionComponent));
+        var component = (HitEngine.Entitas.PositionComponent)CreateComponent(index, typeof(HitEngine.Entitas.PositionComponent));
         component.value = newValue;
         AddComponent(index, component);
     }
 
     public void ReplacePosition(UnityEngine.Vector2 newValue) {
         var index = GameComponentsLookup.Position;
-        var component = (PositionComponent)CreateComponent(index, typeof(PositionComponent));
+        var component = (HitEngine.Entitas.PositionComponent)CreateComponent(index, typeof(HitEngine.Entitas.PositionComponent));
         component.value = newValue;
         ReplaceComponent(index, component);
     }

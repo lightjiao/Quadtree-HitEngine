@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    static readonly QuadtreeRootTag quadtreeRootTagComponent = new QuadtreeRootTag();
+    static readonly HitEngine.Entitas.QuadtreeRootTag quadtreeRootTagComponent = new HitEngine.Entitas.QuadtreeRootTag();
 
     public bool isQuadtreeRootTag {
         get { return HasComponent(GameComponentsLookup.QuadtreeRootTag); }

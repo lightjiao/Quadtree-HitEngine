@@ -8,19 +8,19 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    public AABB aABB { get { return (AABB)GetComponent(GameComponentsLookup.AABB); } }
+    public HitEngine.Entitas.AABB aABB { get { return (HitEngine.Entitas.AABB)GetComponent(GameComponentsLookup.AABB); } }
     public bool hasAABB { get { return HasComponent(GameComponentsLookup.AABB); } }
 
-    public void AddAABB(AsixAligendBoundingBox newBox) {
+    public void AddAABB(HitEngine.Entitas.AsixAligendBoundingBox newBox) {
         var index = GameComponentsLookup.AABB;
-        var component = (AABB)CreateComponent(index, typeof(AABB));
+        var component = (HitEngine.Entitas.AABB)CreateComponent(index, typeof(HitEngine.Entitas.AABB));
         component.box = newBox;
         AddComponent(index, component);
     }
 
-    public void ReplaceAABB(AsixAligendBoundingBox newBox) {
+    public void ReplaceAABB(HitEngine.Entitas.AsixAligendBoundingBox newBox) {
         var index = GameComponentsLookup.AABB;
-        var component = (AABB)CreateComponent(index, typeof(AABB));
+        var component = (HitEngine.Entitas.AABB)CreateComponent(index, typeof(HitEngine.Entitas.AABB));
         component.box = newBox;
         ReplaceComponent(index, component);
     }

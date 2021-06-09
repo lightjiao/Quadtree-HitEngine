@@ -43,19 +43,19 @@ public static class GameComponentsLookup {
     };
 
     public static readonly System.Type[] componentTypes = {
-        typeof(AABB),
-        typeof(BackgroundComponent),
-        typeof(CapuleHitableComponent),
-        typeof(CircleHitableComponent),
-        typeof(InHitComponent),
-        typeof(InQuadtreeIdxComponent),
-        typeof(NeedViewComponent),
-        typeof(PositionComponent),
-        typeof(QuadtreeChildContainerComponent),
-        typeof(QuadtreeNodeComponent),
-        typeof(QuadtreeRootTag),
-        typeof(RandMoverComponent),
-        typeof(RectHitableComponent),
-        typeof(ViewComponent)
+        typeof(HitEngine.Entitas.AABB),
+        typeof(HitEngine.Entitas.BackgroundComponent),
+        typeof(HitEngine.Entitas.CapuleHitableComponent),
+        typeof(HitEngine.Entitas.CircleHitableComponent),
+        typeof(HitEngine.Entitas.InHitComponent),
+        typeof(HitEngine.Entitas.InQuadtreeIdxComponent),
+        typeof(HitEngine.Entitas.NeedViewComponent),
+        typeof(HitEngine.Entitas.PositionComponent),
+        typeof(HitEngine.Entitas.QuadtreeChildContainerComponent),
+        typeof(HitEngine.Entitas.QuadtreeNodeComponent),
+        typeof(HitEngine.Entitas.QuadtreeRootTag),
+        typeof(HitEngine.Entitas.RandMoverComponent),
+        typeof(HitEngine.Entitas.RectHitableComponent),
+        typeof(HitEngine.Entitas.ViewComponent)
     };
 }

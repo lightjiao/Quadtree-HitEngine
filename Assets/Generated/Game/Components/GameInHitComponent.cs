@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    static readonly InHitComponent inHitComponent = new InHitComponent();
+    static readonly HitEngine.Entitas.InHitComponent inHitComponent = new HitEngine.Entitas.InHitComponent();
 
     public bool isInHit {
         get { return HasComponent(GameComponentsLookup.InHit); }

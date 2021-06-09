@@ -9,12 +9,12 @@
 public partial class GameContext {
 
     public GameEntity backgroundEntity { get { return GetGroup(GameMatcher.Background).GetSingleEntity(); } }
-    public BackgroundComponent background { get { return backgroundEntity.background; } }
+    public HitEngine.Entitas.BackgroundComponent background { get { return backgroundEntity.background; } }
     public bool hasBackground { get { return backgroundEntity != null; } }
 
     public GameEntity SetBackground(UnityEngine.GameObject newGo, float newLeft, float newRight, float newTop, float newBottom) {
         if (hasBackground) {
-            throw new Entitas.EntitasException("Could not set Background!\n" + this + " already has an entity with BackgroundComponent!",
+            throw new Entitas.EntitasException("Could not set Background!\n" + this + " already has an entity with HitEngine.Entitas.BackgroundComponent!",
                 "You should check if the context already has a backgroundEntity before setting it or use context.ReplaceBackground().");
         }
         var entity = CreateEntity();
@@ -46,12 +46,12 @@ public partial class GameContext {
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    public BackgroundComponent background { get { return (BackgroundComponent)GetComponent(GameComponentsLookup.Background); } }
+    public HitEngine.Entitas.BackgroundComponent background { get { return (HitEngine.Entitas.BackgroundComponent)GetComponent(GameComponentsLookup.Background); } }
     public bool hasBackground { get { return HasComponent(GameComponentsLookup.Background); } }
 
     public void AddBackground(UnityEngine.GameObject newGo, float newLeft, float newRight, float newTop, float newBottom) {
         var index = GameComponentsLookup.Background;
-        var component = (BackgroundComponent)CreateComponent(index, typeof(BackgroundComponent));
+        var component = (HitEngine.Entitas.BackgroundComponent)CreateComponent(index, typeof(HitEngine.Entitas.BackgroundComponent));
         component.go = newGo;
         component.left = newLeft;
         component.right = newRight;
@@ -62,7 +62,7 @@ public partial class GameEntity {
 
     public void ReplaceBackground(UnityEngine.GameObject newGo, float newLeft, float newRight, float newTop, float newBottom) {
         var index = GameComponentsLookup.Background;
-        var component = (BackgroundComponent)CreateComponent(index, typeof(BackgroundComponent));
+        var component = (HitEngine.Entitas.BackgroundComponent)CreateComponent(index, typeof(HitEngine.Entitas.BackgroundComponent));
         component.go = newGo;
         component.left = newLeft;
         component.right = newRight;

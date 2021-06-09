@@ -8,19 +8,19 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    public ViewComponent view { get { return (ViewComponent)GetComponent(GameComponentsLookup.View); } }
+    public HitEngine.Entitas.ViewComponent view { get { return (HitEngine.Entitas.ViewComponent)GetComponent(GameComponentsLookup.View); } }
     public bool hasView { get { return HasComponent(GameComponentsLookup.View); } }
 
     public void AddView(UnityEngine.GameObject newGo) {
         var index = GameComponentsLookup.View;
-        var component = (ViewComponent)CreateComponent(index, typeof(ViewComponent));
+        var component = (HitEngine.Entitas.ViewComponent)CreateComponent(index, typeof(HitEngine.Entitas.ViewComponent));
         component.go = newGo;
         AddComponent(index, component);
     }
 
     public void ReplaceView(UnityEngine.GameObject newGo) {
         var index = GameComponentsLookup.View;
-        var component = (ViewComponent)CreateComponent(index, typeof(ViewComponent));
+        var component = (HitEngine.Entitas.ViewComponent)CreateComponent(index, typeof(HitEngine.Entitas.ViewComponent));
         component.go = newGo;
         ReplaceComponent(index, component);
     }

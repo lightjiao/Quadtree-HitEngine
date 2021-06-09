@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    static readonly NeedViewComponent needViewComponent = new NeedViewComponent();
+    static readonly HitEngine.Entitas.NeedViewComponent needViewComponent = new HitEngine.Entitas.NeedViewComponent();
 
     public bool isNeedView {
         get { return HasComponent(GameComponentsLookup.NeedView); }

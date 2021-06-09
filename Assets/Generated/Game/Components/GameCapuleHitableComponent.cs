@@ -8,12 +8,12 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    public CapuleHitableComponent capuleHitable { get { return (CapuleHitableComponent)GetComponent(GameComponentsLookup.CapuleHitable); } }
+    public HitEngine.Entitas.CapuleHitableComponent capuleHitable { get { return (HitEngine.Entitas.CapuleHitableComponent)GetComponent(GameComponentsLookup.CapuleHitable); } }
     public bool hasCapuleHitable { get { return HasComponent(GameComponentsLookup.CapuleHitable); } }
 
     public void AddCapuleHitable(float newRadius, UnityEngine.Vector2 newVec) {
         var index = GameComponentsLookup.CapuleHitable;
-        var component = (CapuleHitableComponent)CreateComponent(index, typeof(CapuleHitableComponent));
+        var component = (HitEngine.Entitas.CapuleHitableComponent)CreateComponent(index, typeof(HitEngine.Entitas.CapuleHitableComponent));
         component.radius = newRadius;
         component.vec = newVec;
         AddComponent(index, component);
@@ -21,7 +21,7 @@ public partial class GameEntity {
 
     public void ReplaceCapuleHitable(float newRadius, UnityEngine.Vector2 newVec) {
         var index = GameComponentsLookup.CapuleHitable;
-        var component = (CapuleHitableComponent)CreateComponent(index, typeof(CapuleHitableComponent));
+        var component = (HitEngine.Entitas.CapuleHitableComponent)CreateComponent(index, typeof(HitEngine.Entitas.CapuleHitableComponent));
         component.radius = newRadius;
         component.vec = newVec;
         ReplaceComponent(index, component);

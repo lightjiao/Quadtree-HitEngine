@@ -8,20 +8,20 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    public QuadtreeNodeComponent quadtreeNode { get { return (QuadtreeNodeComponent)GetComponent(GameComponentsLookup.QuadtreeNode); } }
+    public HitEngine.Entitas.QuadtreeNodeComponent quadtreeNode { get { return (HitEngine.Entitas.QuadtreeNodeComponent)GetComponent(GameComponentsLookup.QuadtreeNode); } }
     public bool hasQuadtreeNode { get { return HasComponent(GameComponentsLookup.QuadtreeNode); } }
 
-    public void AddQuadtreeNode(int newIndex, AsixAligendBoundingBox newBox) {
+    public void AddQuadtreeNode(int newIndex, HitEngine.Entitas.AsixAligendBoundingBox newBox) {
         var index = GameComponentsLookup.QuadtreeNode;
-        var component = (QuadtreeNodeComponent)CreateComponent(index, typeof(QuadtreeNodeComponent));
+        var component = (HitEngine.Entitas.QuadtreeNodeComponent)CreateComponent(index, typeof(HitEngine.Entitas.QuadtreeNodeComponent));
         component.index = newIndex;
         component.box = newBox;
         AddComponent(index, component);
     }
 
-    public void ReplaceQuadtreeNode(int newIndex, AsixAligendBoundingBox newBox) {
+    public void ReplaceQuadtreeNode(int newIndex, HitEngine.Entitas.AsixAligendBoundingBox newBox) {
         var index = GameComponentsLookup.QuadtreeNode;
-        var component = (QuadtreeNodeComponent)CreateComponent(index, typeof(QuadtreeNodeComponent));
+        var component = (HitEngine.Entitas.QuadtreeNodeComponent)CreateComponent(index, typeof(HitEngine.Entitas.QuadtreeNodeComponent));
         component.index = newIndex;
         component.box = newBox;
         ReplaceComponent(index, component);
