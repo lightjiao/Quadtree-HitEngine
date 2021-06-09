@@ -17,7 +17,7 @@ public struct AsixAligendBoundingBox
 }
 
 [Game]
-public class AABB : IComponent
+public struct AABB : IComponent
 {
     public AsixAligendBoundingBox box;
 }
@@ -27,16 +27,28 @@ public class AABB : IComponent
 /// 表示Entity在四叉树的哪一个节点中
 /// </summary>
 [Game]
-public class InQuadtreeIdxComponent : IComponent
+public struct InQuadtreeIdxComponent : IComponent
 {
     public int value;
 }
 
-/// <summary>
-/// singleton，一维数组表示的四叉树的空间
-/// </summary>
-[Game, Unique]
-public class QuadtreeArrayComponent : IComponent
+[Game]
+public struct QuadtreeRootTag : IComponent
 {
-    public AsixAligendBoundingBox[] array;
+}
+
+[Game]
+public struct QuadtreeNodeComponent : IComponent
+{
+    public int index;
+    public AsixAligendBoundingBox box;
+}
+
+[Game]
+public struct QuadtreeChildContainerComponent : IComponent
+{
+    public GameEntity leftTop;
+    public GameEntity rightTop;
+    public GameEntity leftBottom;
+    public GameEntity rightBottom;
 }
