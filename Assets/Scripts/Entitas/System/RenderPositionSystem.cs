@@ -1,27 +1,30 @@
 ﻿using Entitas;
 using System.Collections.Generic;
 
-public class RenderPositionSystem : ReactiveSystem<GameEntity>
+namespace HitEngine.Entitas
 {
-    public RenderPositionSystem(Contexts contexts) : base(contexts.game)
+    public class RenderPositionSystem : ReactiveSystem<GameEntity>
     {
-    }
-
-    protected override void Execute(List<GameEntity> entities)
-    {
-        foreach (var e in entities)
+        public RenderPositionSystem(Contexts contexts) : base(contexts.game)
         {
-            e.view.go.transform.position = e.position.value;
         }
-    }
 
-    protected override bool Filter(GameEntity entity)
-    {
-        return entity.hasPosition && entity.hasView;
-    }
+        protected override void Execute(List<GameEntity> entities)
+        {
+            foreach (var e in entities)
+            {
+                e.view.go.transform.position = e.position.value;
+            }
+        }
 
-    protected override ICollector<GameEntity> GetTrigger(IContext<GameEntity> context)
-    {
-        return context.CreateCollector(GameMatcher.Position);
+        protected override bool Filter(GameEntity entity)
+        {
+            return entity.hasPosition && entity.hasView;
+        }
+
+        protected override ICollector<GameEntity> GetTrigger(IContext<GameEntity> context)
+        {
+            return context.CreateCollector(GameMatcher.Position);
+        }
     }
 }

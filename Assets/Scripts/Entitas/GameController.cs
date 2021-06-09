@@ -1,32 +1,35 @@
 ﻿using Entitas;
 using UnityEngine;
 
-public class GameController : MonoBehaviour
+namespace HitEngine.Entitas
 {
-    private Systems _systems;
-
-    // Start is called before the first frame update
-    private void Start()
+    public class GameController : MonoBehaviour
     {
-        var contexts = Contexts.sharedInstance;
+        private Systems _systems;
 
-        var initFeature = new Feature("Init");
-        initFeature.Add(new RenderBackground(contexts));
-        initFeature.Add(new InitSystem(contexts));
+        // Start is called before the first frame update
+        private void Start()
+        {
+            var contexts = Contexts.sharedInstance;
 
-        _systems = new Feature("System")
-            .Add(initFeature)
-            .Add(new MoveFeature(contexts))
-            .Add(new HitEngineFeature(contexts))
-            .Add(new ViewFeature(contexts));
+            var initFeature = new Feature("Init");
+            initFeature.Add(new RenderBackground(contexts));
+            initFeature.Add(new InitSystem(contexts));
 
-        _systems.Initialize();
-    }
+            _systems = new Feature("System")
+                .Add(initFeature)
+                .Add(new MoveFeature(contexts))
+                .Add(new HitEngineFeature(contexts))
+                .Add(new ViewFeature(contexts));
 
-    // Update is called once per frame
-    private void Update()
-    {
-        _systems.Execute();
-        _systems.Cleanup();
+            _systems.Initialize();
+        }
+
+        // Update is called once per frame
+        private void Update()
+        {
+            _systems.Execute();
+            _systems.Cleanup();
+        }
     }
 }

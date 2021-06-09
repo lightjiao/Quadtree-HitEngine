@@ -1,8 +1,11 @@
-public class HitEngineFeature : Feature
+namespace HitEngine.Entitas
 {
-    public HitEngineFeature(Contexts contexts) : base("Hit Engine")
+    public class HitEngineFeature : Feature
     {
-        //Add(new DefaultCheckHitSystem(contexts));
-        Add(new QuadtreeCheckHitEngine(contexts));
+        public HitEngineFeature(Contexts contexts) : base("Hit Engine")
+        {
+            //Add(new DefaultCheckHitSystem(contexts));
+            Add(new QuadtreeCheckHitEngine(contexts));
+        }
     }
 }

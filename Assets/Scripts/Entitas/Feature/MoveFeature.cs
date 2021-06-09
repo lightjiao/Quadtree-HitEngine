@@ -1,7 +1,10 @@
-﻿internal class MoveFeature : Feature
+﻿namespace HitEngine.Entitas
 {
-    public MoveFeature(Contexts contexts) : base("Move")
+    internal class MoveFeature : Feature
     {
-        Add(new RandMovementSystem(contexts));
+        public MoveFeature(Contexts contexts) : base("Move")
+        {
+            Add(new RandMovementSystem(contexts));
+        }
     }
 }

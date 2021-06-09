@@ -1,31 +1,34 @@
 ﻿using Entitas;
 using UnityEngine;
 
-internal class RenderInHitSystem : IExecuteSystem
+namespace HitEngine.Entitas
 {
-    private GameContext _context;
-
-    public RenderInHitSystem(Contexts contexts)
+    internal class RenderInHitSystem : IExecuteSystem
     {
-        _context = contexts.game;
-    }
+        private GameContext _context;
 
-    public void Execute()
-    {
-        var group = _context.GetGroup(GameMatcher.AllOf(GameMatcher.View)
-            .AnyOf(
-                GameMatcher.CircleHitable,
-                GameMatcher.RectHitable,
-                GameMatcher.CapuleHitable
-            )
-        );
-
-        foreach (var e in group.AsEnumerable())
+        public RenderInHitSystem(Contexts contexts)
         {
-            var color = e.isInHit ? Color.red : Color.white;
+            _context = contexts.game;
+        }
 
-            var renderer = e.view.go.GetComponent<Renderer>();
-            renderer.material.SetColor("_Color", color);
+        public void Execute()
+        {
+            var group = _context.GetGroup(GameMatcher.AllOf(GameMatcher.View)
+                .AnyOf(
+                    GameMatcher.CircleHitable,
+                    GameMatcher.RectHitable,
+                    GameMatcher.CapuleHitable
+                )
+            );
+
+            foreach (var e in group.AsEnumerable())
+            {
+                var color = e.isInHit ? Color.red : Color.white;
+
+                var renderer = e.view.go.GetComponent<Renderer>();
+                renderer.material.SetColor("_Color", color);
+            }
         }
     }
 }

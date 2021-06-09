@@ -2,37 +2,40 @@
 using Entitas.Unity;
 using UnityEngine;
 
-internal class RenderBackground : IInitializeSystem
+namespace HitEngine.Entitas
 {
-    // 背景的长宽
-    private const float backgroundLength = 100f;
-    // 一个plane默认的长宽
-    private const float planeLength = 10f;
-
-    private GameContext _context;
-
-    public RenderBackground(Contexts contexts)
+    internal class RenderBackground : IInitializeSystem
     {
-        _context = contexts.game;
-    }
+        // 背景的长宽
+        private const float backgroundLength = 100f;
+        // 一个plane默认的长宽
+        private const float planeLength = 10f;
 
-    public void Initialize()
-    {
-        var backgroundGo = GameObject.CreatePrimitive(PrimitiveType.Plane);
-        backgroundGo.name = "Background";
-        backgroundGo.transform.position = new Vector3(0, 0, 0.1f);
-        backgroundGo.transform.up = Vector3.back;
-        backgroundGo.transform.localScale = new Vector3(backgroundLength / planeLength, 1, backgroundLength / planeLength);
-        backgroundGo.GetComponent<Renderer>().material.SetColor("_Color", Color.gray);
+        private GameContext _context;
 
-        _context.SetBackground(backgroundGo,
-            -backgroundLength / 2,
-            backgroundLength / 2,
-             backgroundLength / 2,
-            -backgroundLength / 2
-        );
-        backgroundGo.Link(_context.backgroundEntity);
+        public RenderBackground(Contexts contexts)
+        {
+            _context = contexts.game;
+        }
 
-        Camera.main.orthographicSize = backgroundLength / 2;
+        public void Initialize()
+        {
+            var backgroundGo = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            backgroundGo.name = "Background";
+            backgroundGo.transform.position = new Vector3(0, 0, 0.1f);
+            backgroundGo.transform.up = Vector3.back;
+            backgroundGo.transform.localScale = new Vector3(backgroundLength / planeLength, 1, backgroundLength / planeLength);
+            backgroundGo.GetComponent<Renderer>().material.SetColor("_Color", Color.gray);
+
+            _context.SetBackground(backgroundGo,
+                -backgroundLength / 2,
+                backgroundLength / 2,
+                 backgroundLength / 2,
+                -backgroundLength / 2
+            );
+            backgroundGo.Link(_context.backgroundEntity);
+
+            Camera.main.orthographicSize = backgroundLength / 2;
+        }
     }
 }

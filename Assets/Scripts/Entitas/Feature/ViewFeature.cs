@@ -1,10 +1,13 @@
-﻿public class ViewFeature : Feature
+﻿namespace HitEngine.Entitas
 {
-    public ViewFeature(Contexts contexts) : base("ViewFeature")
+    public class ViewFeature : Feature
     {
-        Add(new AddViewSystem(contexts));
-        Add(new RenderPositionSystem(contexts));
-        Add(new RenderHitableSystem(contexts));
-        Add(new RenderInHitSystem(contexts));
+        public ViewFeature(Contexts contexts) : base("ViewFeature")
+        {
+            Add(new AddViewSystem(contexts));
+            Add(new RenderPositionSystem(contexts));
+            Add(new RenderHitableSystem(contexts));
+            Add(new RenderInHitSystem(contexts));
+        }
     }
 }
