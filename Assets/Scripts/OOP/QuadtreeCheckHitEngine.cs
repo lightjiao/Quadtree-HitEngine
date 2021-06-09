@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Jobs;
+using Unity.Collections;
 
 namespace HitEngine.OOP
 {
@@ -42,15 +43,6 @@ namespace HitEngine.OOP
         private List<MyCircleCollider> m_AllColliders = new List<MyCircleCollider>();
         private QuadtreeNode[] m_Quadtree;
 
-        // 碰撞检测的Job
-        private struct CheckHitJob : IJob
-        {
-            public void Execute()
-            {
-                throw new System.NotImplementedException();
-            }
-        }
-
         private void Awake()
         {
             InitQuadtree();
@@ -64,7 +56,7 @@ namespace HitEngine.OOP
 
         public void RegisterOne(MyCircleCollider myCollider)
         {
-            myCollider.inQuadTreeIndex = -1;
+            myCollider.Data.inQuadTreeIndex = -1;
             m_AllColliders.Add(myCollider);
         }
 
@@ -140,7 +132,7 @@ namespace HitEngine.OOP
         {
             foreach (var myCollider in m_AllColliders)
             {
-                if (false == UpdateQuadtree(myCollider.inQuadTreeIndex, myCollider))
+                if (false == UpdateQuadtree(myCollider.Data.inQuadTreeIndex, myCollider))
                 {
                     UpdateQuadtree(0, myCollider);    
                 }
@@ -167,7 +159,7 @@ namespace HitEngine.OOP
             }
 
             // 位置没变
-            var oldIndex = myCollider.inQuadTreeIndex;
+            var oldIndex = myCollider.Data.inQuadTreeIndex;
             if (oldIndex == index) return true;
 
             // 在旧的节点移除，添加到新的节点
@@ -177,8 +169,20 @@ namespace HitEngine.OOP
             }
 
             m_Quadtree[index].Colliders.Add(myCollider);
-            myCollider.inQuadTreeIndex = index;
+            myCollider.Data.inQuadTreeIndex = index;
             return true;
+        }
+
+
+        // 碰撞检测的Job
+        private struct CheckHitJob : IJob
+        {
+            NativeArray<MyCircleColliderData> HundreadColliders;
+
+            public void Execute()
+            {
+                throw new System.NotImplementedException();
+            }
         }
 
         private void CheckHit()
