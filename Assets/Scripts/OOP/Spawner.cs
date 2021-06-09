@@ -30,7 +30,7 @@ namespace HitEngine.OOP
 
                 var myCircleCollider = go.AddComponent<MyCircleCollider>();
                 myCircleCollider.InitRandCircle();
-                myCircleCollider.Uid = i;
+                myCircleCollider.Data.Uid = i;
                 _quadtreeCheckHitEngine.RegisterOne(myCircleCollider);
 
                 i++;

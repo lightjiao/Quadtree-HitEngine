@@ -4,18 +4,25 @@ namespace HitEngine.OOP
 {
     public struct MyCircleColliderData
     {
+        public int Uid;
         public Vector2 point;
         public float radius;
         public int inQuadTreeIndex;
         public bool IsInHit;
+        public AABB box;
+        
+        public bool CheckHit(MyCircleColliderData other)
+        {
+            var disSqr = (point - other.point).sqrMagnitude;
+            var radiusSumSqr = (radius + other.radius) * (radius + other.radius);
+
+            return disSqr <= radiusSumSqr;
+        }
     }
 
     public class MyCircleCollider : MonoBehaviour
     {
         public MyCircleColliderData Data;
-        public AABB box;
-
-        public int Uid;
 
         private Renderer _renderer;
 
@@ -23,28 +30,17 @@ namespace HitEngine.OOP
         {
             Data = new MyCircleColliderData
             {
+                Uid = -1,
+                point = new Vector2(),
                 radius = Random.Range(1f, 3f),
                 inQuadTreeIndex = -1,
                 IsInHit = false,
+                box = new AABB(),
             };
 
             transform.localScale = new Vector3(Data.radius * 2, Data.radius * 2, 0.1f);
-            box = new AABB();
 
             _renderer = GetComponent<Renderer>();
-        }
-
-        public bool CheckHit(MyCircleCollider other)
-        {
-            var disSqr = (Data.point - other.Data.point).sqrMagnitude;
-            var radiusSumSqr = (Data.radius + other.Data.radius) * (Data.radius + other.Data.radius);
-
-            return disSqr <= radiusSumSqr;
-        }
-
-        public void SetInHitStatus(bool isInHit)
-        {
-            Data.IsInHit = isInHit;
         }
 
         public void FlushHitStatus()
@@ -53,16 +49,16 @@ namespace HitEngine.OOP
             _renderer.material.SetColor("_Color", color);
         }
 
-        private void FixedUpdate()
+        private void Update()
         {
             var pos = transform.position;
             Data.point.x = pos.x;
             Data.point.y = pos.y;
 
-            box.Left = Data.point.x - Data.radius;
-            box.Right = Data.point.x + Data.radius;
-            box.Top = Data.point.y + Data.radius;
-            box.Bottom = Data.point.y - Data.radius;
+            Data.box.Left = Data.point.x - Data.radius;
+            Data.box.Right = Data.point.x + Data.radius;
+            Data.box.Top = Data.point.y + Data.radius;
+            Data.box.Bottom = Data.point.y - Data.radius;
         }
     }
 }

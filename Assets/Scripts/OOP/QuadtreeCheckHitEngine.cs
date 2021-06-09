@@ -33,6 +33,13 @@ namespace HitEngine.OOP
         public List<MyCircleCollider> Colliders;
     }
 
+    public struct QuadtreeNodeData
+    {
+        public int Index;
+        public AABB Box;
+        public NativeArray<MyCircleColliderData> ColliderDatas;
+    }
+
     public class QuadtreeCheckHitEngine : MonoBehaviour
     {
         public float BackgroundLength = 100f;
@@ -48,7 +55,7 @@ namespace HitEngine.OOP
             InitQuadtree();
         }
 
-        private void FixedUpdate()
+        private void Update()
         {
             UpdateQuadtree();
             CheckHit();
@@ -56,7 +63,6 @@ namespace HitEngine.OOP
 
         public void RegisterOne(MyCircleCollider myCollider)
         {
-            myCollider.Data.inQuadTreeIndex = -1;
             m_AllColliders.Add(myCollider);
         }
 
@@ -134,7 +140,7 @@ namespace HitEngine.OOP
             {
                 if (false == UpdateQuadtree(myCollider.Data.inQuadTreeIndex, myCollider))
                 {
-                    UpdateQuadtree(0, myCollider);    
+                    UpdateQuadtree(0, myCollider);
                 }
             }
         }
@@ -144,7 +150,7 @@ namespace HitEngine.OOP
             if (index < 0 || index >= m_Quadtree.Length) return false;
 
             var node = m_Quadtree[index];
-            if (index != 0 && !myCollider.box.IsIn(node.Box))
+            if (index != 0 && !myCollider.Data.box.IsIn(node.Box))
             {
                 return false;
             }
@@ -177,51 +183,90 @@ namespace HitEngine.OOP
         // 碰撞检测的Job
         private struct CheckHitJob : IJob
         {
-            NativeArray<MyCircleColliderData> HundreadColliders;
+            // 100个碰撞体
+            public NativeArray<MyCircleColliderData> HundreadColliders;
+            //public NativeArray<QuadtreeNodeData> quadtree;
 
             public void Execute()
             {
-                throw new System.NotImplementedException();
+                for (var i = 0; i < HundreadColliders.Length; i++)
+                {
+                    var dataCopy = HundreadColliders[i];
+                    dataCopy.IsInHit = true;
+                    HundreadColliders[i] = dataCopy;
+                }
+
+                //for (var i = 0; i < HundreadColliders.Length; i++)
+                //{
+                //    var dataCopy = HundreadColliders[i];
+                //    dataCopy.IsInHit = false;
+
+                //    var stack = new Stack<int>();
+                //    stack.Push(0);
+                //    while (stack.Count > 0)
+                //    {
+                //        var index = stack.Pop();
+                //        if (index < 0 || index >= quadtree.Length) continue;
+
+                //        var quadTreeNode = quadtree[index];
+                //        var aabb = quadTreeNode.Box;
+                //        if (false == dataCopy.box.IsIn(aabb)) continue;
+
+                //        // 子节点下标为 4(i+1)-3, 4(i+1)-2, 4(i+1)-1, 4(i+1)-0
+                //        stack.Push(4 * (index + 1) - 3);
+                //        stack.Push(4 * (index + 1) - 2);
+                //        stack.Push(4 * (index + 1) - 1);
+                //        stack.Push(4 * (index + 1) - 0);
+
+                //        foreach (var otherColliderData in quadTreeNode.ColliderDatas)
+                //        {
+                //            if (dataCopy.Uid == otherColliderData.Uid) continue;
+                //            if (dataCopy.CheckHit(otherColliderData))
+                //            {
+                //                dataCopy.IsInHit = true;
+                //            }
+                //        }
+                //    }
+
+                //    HundreadColliders[i] = dataCopy;
+                //}
             }
         }
 
         private void CheckHit()
         {
-            foreach (var myCollider in m_AllColliders)
+            //var quadtreeNativeArray = new NativeArray<QuadtreeNodeData>(m_Quadtree.Length, Allocator.TempJob);
+            //for (var i = 0; i < quadtreeNativeArray.Length; i++)
+            //{
+            //    var collidersData = new NativeArray<MyCircleColliderData>(m_Quadtree[i].Colliders.Count, Allocator.TempJob);
+            //    for (var j = 0; j < m_Quadtree[i].Colliders.Count; j++)
+            //    {
+            //        collidersData[i] = m_Quadtree[i].Colliders[i].Data;
+            //    }
+
+            //    quadtreeNativeArray[i] = new QuadtreeNodeData
+            //    {
+            //        Index = m_Quadtree[i].Index,
+            //        Box = m_Quadtree[i].Box,
+            //        ColliderDatas = collidersData
+            //    };
+            //}
+
+            var job = new CheckHitJob
             {
-                myCollider.SetInHitStatus(false);
+                HundreadColliders = new NativeArray<MyCircleColliderData>(m_AllColliders.Count, Allocator.TempJob),
+                //quadtree = quadtreeNativeArray,
+            };
 
-                var stack = new Stack<QuadtreeNode>();
-                stack.Push(m_Quadtree[0]);
-                while (stack.Count > 0)
-                {
-                    var quadTreeNode = stack.Pop();
-                    var aabb = quadTreeNode.Box;
-                    var index = quadTreeNode.Index;
-                    if (false == myCollider.box.IsIn(aabb)) continue;
+            job.Schedule().Complete();
 
-                    // 子节点下标为 4(i+1)-3, 4(i+1)-2, 4(i+1)-1, 4(i+1)-0
-                    if (4 * (index + 1) < m_Quadtree.Length)
-                    {
-                        stack.Push(m_Quadtree[4 * (index + 1) - 3]);
-                        stack.Push(m_Quadtree[4 * (index + 1) - 2]);
-                        stack.Push(m_Quadtree[4 * (index + 1) - 1]);
-                        stack.Push(m_Quadtree[4 * (index + 1) - 0]);
-                    }
-
-                    foreach (var otherCollider in quadTreeNode.Colliders)
-                    {
-                        if (myCollider == otherCollider) continue;
-                        if (myCollider.CheckHit(otherCollider))
-                        {
-                            myCollider.SetInHitStatus(true);
-                            otherCollider.SetInHitStatus(true);
-                        }
-                    }
-                }
-
-                myCollider.FlushHitStatus();
+            for (var i = 0; i < job.HundreadColliders.Length; i++)
+            {
+                m_AllColliders[i].Data = job.HundreadColliders[i];
+                m_AllColliders[i].FlushHitStatus();
             }
+
+            job.HundreadColliders.Dispose();
         }
     }
 }

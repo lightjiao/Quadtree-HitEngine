@@ -19,7 +19,7 @@ namespace HitEngine.OOP
             backgroundLength = FindObjectOfType<QuadtreeCheckHitEngine>().BackgroundLength;
         }
 
-        private void FixedUpdate()
+        private void Update()
         {
             Vector2 newPos = transform.position;
             newPos += Speed * Time.fixedDeltaTime;
