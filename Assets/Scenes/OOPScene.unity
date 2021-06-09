@@ -439,7 +439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0632ca15a35108d479099996a0ffbcb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  number: 100
+  number: 700
 --- !u!1 &1013954720
 GameObject:
   m_ObjectHideFlags: 0
@@ -484,6 +484,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BackgroundLength: 100
-  depth: 1
+  depth: 3
   m_LooseSpacing: 5
   m_AllColliders: []
