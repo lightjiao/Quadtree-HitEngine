@@ -17,7 +17,7 @@ namespace HitEngine.Entitas
 
         public void Initialize()
         {
-            for (var i = 0; i < 500; i++)
+            for (var i = 0; i < 100; i++)
             {
                 var circleEntity = _context.CreateEntity();
                 circleEntity.isNeedView = true;
