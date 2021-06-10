@@ -23,6 +23,19 @@ namespace HitEngine.OOP
 
             return false;
         }
+        
+        public bool IsHit(AABB other)
+        {
+            if (Right >= other.Left && Left <= other.Right)
+            {
+                if (Bottom <= other.Top && Top >= other.Bottom)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 
     public struct QuadtreeNode
@@ -191,13 +204,6 @@ namespace HitEngine.OOP
                 for (var i = 0; i < CheckedColliders.Length; i++)
                 {
                     var dataCopy = CheckedColliders[i];
-                    dataCopy.IsInHit = true;
-                    CheckedColliders[i] = dataCopy;
-                }
-
-                for (var i = 0; i < CheckedColliders.Length; i++)
-                {
-                    var dataCopy = CheckedColliders[i];
                     dataCopy.IsInHit = false;
 
                     var stack = new Stack<int>();
@@ -209,19 +215,18 @@ namespace HitEngine.OOP
 
                         var treeNode = Quadtree[index];
                         var aabb = treeNode.Box;
-                        if (false == dataCopy.box.IsIn(aabb)) continue;
+                        if (false == dataCopy.box.IsHit(aabb)) continue;
 
                         // 子节点下标为 4(i+1)-3, 4(i+1)-2, 4(i+1)-1, 4(i+1)-0
+                        // TODO: 可以改为提前判断是否在子节点，再push，减少出栈入栈次数
                         stack.Push(4 * (index + 1) - 3);
                         stack.Push(4 * (index + 1) - 2);
                         stack.Push(4 * (index + 1) - 1);
                         stack.Push(4 * (index + 1) - 0);
 
-                        for (var otherColliderIdx = treeNode.ColliderStartIdx;
-                            otherColliderIdx < treeNode.ColliderCount;
-                            otherColliderIdx++)
+                        for (var j = 0; j < treeNode.ColliderCount; j++)
                         {
-                            var otherColliderData = AllColliders[otherColliderIdx];
+                            var otherColliderData = AllColliders[treeNode.ColliderStartIdx + j];
                             if (dataCopy.Uid == otherColliderData.Uid) continue;
                             if (dataCopy.CheckHit(otherColliderData))
                             {
