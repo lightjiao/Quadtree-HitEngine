@@ -22,7 +22,7 @@ namespace HitEngine.OOP
         private void Update()
         {
             Vector2 newPos = transform.position;
-            newPos += Speed * Time.fixedDeltaTime;
+            newPos += Speed * Time.deltaTime;
 
             if (newPos.x < -backgroundLength / 2 || newPos.x > backgroundLength / 2)
             {
