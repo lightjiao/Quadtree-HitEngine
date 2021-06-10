@@ -5,7 +5,6 @@ using Unity.Collections;
 
 namespace HitEngine.OOP
 {
-
     public struct AABB
     {
         public float Left;
@@ -33,21 +32,14 @@ namespace HitEngine.OOP
         public List<MyCircleCollider> Colliders;
     }
 
-    public struct QuadtreeNodeData
-    {
-        public int Index;
-        public AABB Box;
-        public NativeArray<MyCircleColliderData> ColliderDatas;
-    }
-
     public class QuadtreeCheckHitEngine : MonoBehaviour
     {
         public float BackgroundLength = 100f;
         [SerializeField] private int depth = 3;
         [SerializeField] private float m_LooseSpacing = 5f;
+        [SerializeField] private int ColliderNumPerJob = 100;
 
-        [SerializeField]
-        private List<MyCircleCollider> m_AllColliders = new List<MyCircleCollider>();
+        [SerializeField] private List<MyCircleCollider> m_AllColliders = new List<MyCircleCollider>();
         private QuadtreeNode[] m_Quadtree;
 
         private void Awake()
@@ -71,7 +63,7 @@ namespace HitEngine.OOP
             var nodeSum = 0;
             for (var i = 0; i < depth; i++)
             {
-                nodeSum += (int)Mathf.Pow(4, i);
+                nodeSum += (int) Mathf.Pow(4, i);
             }
 
             // 用数组表示四叉树
@@ -179,94 +171,154 @@ namespace HitEngine.OOP
             return true;
         }
 
+        public struct QuadtreeNodeJobData
+        {
+            public int Index;
+            public AABB Box;
+            public int ColliderStartIdx; // 包含的碰撞体开始下标(include)
+            public int ColliderCount; // 包含的碰撞体结束下标(exclude)
+        }
 
         // 碰撞检测的Job
         private struct CheckHitJob : IJob
         {
-            // 100个碰撞体
-            public NativeArray<MyCircleColliderData> HundreadColliders;
-            //public NativeArray<QuadtreeNodeData> quadtree;
+            public NativeArray<MyCircleColliderData> CheckedColliders;
+            [ReadOnly] public NativeArray<QuadtreeNodeJobData> Quadtree;
+            [ReadOnly] public NativeArray<MyCircleColliderData> AllColliders;
 
             public void Execute()
             {
-                for (var i = 0; i < HundreadColliders.Length; i++)
+                for (var i = 0; i < CheckedColliders.Length; i++)
                 {
-                    var dataCopy = HundreadColliders[i];
+                    var dataCopy = CheckedColliders[i];
                     dataCopy.IsInHit = true;
-                    HundreadColliders[i] = dataCopy;
+                    CheckedColliders[i] = dataCopy;
                 }
 
-                //for (var i = 0; i < HundreadColliders.Length; i++)
-                //{
-                //    var dataCopy = HundreadColliders[i];
-                //    dataCopy.IsInHit = false;
+                for (var i = 0; i < CheckedColliders.Length; i++)
+                {
+                    var dataCopy = CheckedColliders[i];
+                    dataCopy.IsInHit = false;
 
-                //    var stack = new Stack<int>();
-                //    stack.Push(0);
-                //    while (stack.Count > 0)
-                //    {
-                //        var index = stack.Pop();
-                //        if (index < 0 || index >= quadtree.Length) continue;
+                    var stack = new Stack<int>();
+                    stack.Push(0);
+                    while (stack.Count > 0)
+                    {
+                        var index = stack.Pop();
+                        if (index < 0 || index >= Quadtree.Length) continue;
 
-                //        var quadTreeNode = quadtree[index];
-                //        var aabb = quadTreeNode.Box;
-                //        if (false == dataCopy.box.IsIn(aabb)) continue;
+                        var treeNode = Quadtree[index];
+                        var aabb = treeNode.Box;
+                        if (false == dataCopy.box.IsIn(aabb)) continue;
 
-                //        // 子节点下标为 4(i+1)-3, 4(i+1)-2, 4(i+1)-1, 4(i+1)-0
-                //        stack.Push(4 * (index + 1) - 3);
-                //        stack.Push(4 * (index + 1) - 2);
-                //        stack.Push(4 * (index + 1) - 1);
-                //        stack.Push(4 * (index + 1) - 0);
+                        // 子节点下标为 4(i+1)-3, 4(i+1)-2, 4(i+1)-1, 4(i+1)-0
+                        stack.Push(4 * (index + 1) - 3);
+                        stack.Push(4 * (index + 1) - 2);
+                        stack.Push(4 * (index + 1) - 1);
+                        stack.Push(4 * (index + 1) - 0);
 
-                //        foreach (var otherColliderData in quadTreeNode.ColliderDatas)
-                //        {
-                //            if (dataCopy.Uid == otherColliderData.Uid) continue;
-                //            if (dataCopy.CheckHit(otherColliderData))
-                //            {
-                //                dataCopy.IsInHit = true;
-                //            }
-                //        }
-                //    }
+                        for (var otherColliderIdx = treeNode.ColliderStartIdx;
+                            otherColliderIdx < treeNode.ColliderCount;
+                            otherColliderIdx++)
+                        {
+                            var otherColliderData = AllColliders[otherColliderIdx];
+                            if (dataCopy.Uid == otherColliderData.Uid) continue;
+                            if (dataCopy.CheckHit(otherColliderData))
+                            {
+                                dataCopy.IsInHit = true;
+                            }
+                        }
+                    }
 
-                //    HundreadColliders[i] = dataCopy;
-                //}
+                    CheckedColliders[i] = dataCopy;
+                }
             }
         }
 
         private void CheckHit()
         {
-            //var quadtreeNativeArray = new NativeArray<QuadtreeNodeData>(m_Quadtree.Length, Allocator.TempJob);
-            //for (var i = 0; i < quadtreeNativeArray.Length; i++)
-            //{
-            //    var collidersData = new NativeArray<MyCircleColliderData>(m_Quadtree[i].Colliders.Count, Allocator.TempJob);
-            //    for (var j = 0; j < m_Quadtree[i].Colliders.Count; j++)
-            //    {
-            //        collidersData[i] = m_Quadtree[i].Colliders[i].Data;
-            //    }
+            var jobQuadtree = new NativeArray<QuadtreeNodeJobData>(m_Quadtree.Length, Allocator.TempJob);
+            var jobAllColliders = new NativeArray<MyCircleColliderData>(m_AllColliders.Count, Allocator.TempJob);
 
-            //    quadtreeNativeArray[i] = new QuadtreeNodeData
-            //    {
-            //        Index = m_Quadtree[i].Index,
-            //        Box = m_Quadtree[i].Box,
-            //        ColliderDatas = collidersData
-            //    };
-            //}
-
-            var job = new CheckHitJob
+            var collidersPreSum = 0;
+            for (var i = 0; i < m_Quadtree.Length; i++)
             {
-                HundreadColliders = new NativeArray<MyCircleColliderData>(m_AllColliders.Count, Allocator.TempJob),
-                //quadtree = quadtreeNativeArray,
-            };
+                for (var j = 0; j < m_Quadtree[i].Colliders.Count; j++)
+                {
+                    jobAllColliders[collidersPreSum + j] = m_Quadtree[i].Colliders[j].Data;
+                }
 
-            job.Schedule().Complete();
-
-            for (var i = 0; i < job.HundreadColliders.Length; i++)
-            {
-                m_AllColliders[i].Data = job.HundreadColliders[i];
-                m_AllColliders[i].FlushHitStatus();
+                jobQuadtree[i] = new QuadtreeNodeJobData
+                {
+                    Index = m_Quadtree[i].Index,
+                    Box = m_Quadtree[i].Box,
+                    ColliderStartIdx = collidersPreSum,
+                    ColliderCount = m_Quadtree[i].Colliders.Count,
+                };
+                collidersPreSum += m_Quadtree[i].Colliders.Count;
             }
 
-            job.HundreadColliders.Dispose();
+            var jobs = new CheckHitJob[CalJobCount()];
+            var jobHandles = new JobHandle[CalJobCount()];
+            for (var i = 0; i < jobHandles.Length; i++)
+            {
+                jobs[i] = CreateCheckHitJob(jobQuadtree, jobAllColliders, i);
+                jobHandles[i] = jobs[i].Schedule();
+            }
+
+            foreach (var jobHandle in jobHandles)
+            {
+                jobHandle.Complete();
+            }
+
+            for (var i = 0; i < jobs.Length; i++)
+            {
+                for (var j = 0; j < ColliderNumPerJob; j++)
+                {
+                    var realIdx = i * ColliderNumPerJob + j;
+                    if (realIdx >= m_AllColliders.Count) continue;
+                    m_AllColliders[realIdx].Data = jobs[i].CheckedColliders[j];
+                    m_AllColliders[realIdx].FlushHitStatus();
+                }
+            }
+
+            jobQuadtree.Dispose();
+            jobAllColliders.Dispose();
+            foreach (var job in jobs)
+            {
+                job.CheckedColliders.Dispose();
+            }
+        }
+
+        private int CalJobCount()
+        {
+            if (m_AllColliders.Count == 0) return 1;
+
+            if (m_AllColliders.Count % ColliderNumPerJob == 0)
+            {
+                return m_AllColliders.Count / ColliderNumPerJob;
+            }
+
+            return (m_AllColliders.Count / ColliderNumPerJob) + 1;
+        }
+
+        private CheckHitJob CreateCheckHitJob(NativeArray<QuadtreeNodeJobData> jobQuadtree, NativeArray<MyCircleColliderData> jobAllColliders, int jobIndex)
+        {
+            var leftCollidersNum = m_AllColliders.Count - jobIndex * ColliderNumPerJob;
+            var checkedColliderNum = Mathf.Min(leftCollidersNum, ColliderNumPerJob);
+            
+            var jobCheckedColliders = new NativeArray<MyCircleColliderData>(checkedColliderNum, Allocator.TempJob);
+            for (var i = 0; i < checkedColliderNum; i++)
+            {
+                jobCheckedColliders[i] = m_AllColliders[ColliderNumPerJob * jobIndex + i].Data;
+            }
+
+            return new CheckHitJob
+            {
+                CheckedColliders = jobCheckedColliders,
+                Quadtree = jobQuadtree,
+                AllColliders = jobAllColliders
+            };
         }
     }
 }
