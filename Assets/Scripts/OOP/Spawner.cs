@@ -5,23 +5,33 @@ namespace HitEngine.OOP
 {
     public class Spawner : MonoBehaviour
     {
-        [SerializeField] private int number = 100;
+        private enum EngineType
+        {
+            SimpleEngine,
+            QuadtreeEngine
+        }
+
+        [SerializeField] private EngineType m_EngineType;
+        [SerializeField] private int m_TotalNumber = 100;
+        [SerializeField] private int m_SpawnedNumber = 0;
 
         private QuadtreeCheckHitEngine _quadtreeCheckHitEngine;
+        private SimpleHitEngine _simpleHitEngine;
 
         private void Start()
         {
             _quadtreeCheckHitEngine = FindObjectOfType<QuadtreeCheckHitEngine>();
+            _simpleHitEngine = FindObjectOfType<SimpleHitEngine>();
             StartCoroutine(SpawnOne());
         }
 
         private IEnumerator SpawnOne()
         {
-            var i = 0;
-            while (i < number)
+            m_SpawnedNumber = 0;
+            while (m_SpawnedNumber < m_TotalNumber)
             {
                 var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                go.name = i.ToString();
+                go.name = m_SpawnedNumber.ToString();
                 go.transform.parent = transform;
                 Destroy(go.GetComponent<Collider>());
 
@@ -30,10 +40,18 @@ namespace HitEngine.OOP
 
                 var myCircleCollider = go.AddComponent<MyCircleCollider>();
                 myCircleCollider.InitRandCircle();
-                myCircleCollider.Data.Uid = i;
-                _quadtreeCheckHitEngine.RegisterOne(myCircleCollider);
+                myCircleCollider.Data.Uid = m_SpawnedNumber;
 
-                i++;
+                if (m_EngineType == EngineType.QuadtreeEngine)
+                {
+                    _quadtreeCheckHitEngine.RegisterOne(myCircleCollider);
+                }
+                else if (m_EngineType == EngineType.SimpleEngine)
+                {
+                    _simpleHitEngine.RegisterOne(myCircleCollider);
+                }
+
+                m_SpawnedNumber++;
                 yield return null;
             }
 

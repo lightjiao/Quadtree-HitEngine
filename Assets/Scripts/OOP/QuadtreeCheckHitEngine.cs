@@ -23,7 +23,7 @@ namespace HitEngine.OOP
 
             return false;
         }
-        
+
         public bool IsHit(AABB other)
         {
             if (Right >= other.Left && Left <= other.Right)
@@ -193,64 +193,59 @@ namespace HitEngine.OOP
         }
 
         // 碰撞检测的Job
-        private struct CheckHitJob : IJob
+        private struct CheckHitJob : IJobParallelFor
         {
-            public NativeArray<MyCircleColliderData> CheckedColliders;
+            public NativeArray<MyCircleColliderData> WriteColliders;
             [ReadOnly] public NativeArray<QuadtreeNodeJobData> Quadtree;
-            [ReadOnly] public NativeArray<MyCircleColliderData> AllColliders;
+            [ReadOnly] public NativeArray<MyCircleColliderData> ReadCollidersInTree;
 
-            public void Execute()
+            public void Execute(int i)
             {
-                for (var i = 0; i < CheckedColliders.Length; i++)
+                var dataCopy = WriteColliders[i];
+                dataCopy.IsInHit = false;
+
+                var stack = new Stack<int>();
+                stack.Push(0);
+                while (stack.Count > 0)
                 {
-                    var dataCopy = CheckedColliders[i];
-                    dataCopy.IsInHit = false;
+                    var treeIdx = stack.Pop();
+                    if (treeIdx < 0 || treeIdx >= Quadtree.Length) continue;
+                    var treeNode = Quadtree[treeIdx];
 
-                    var stack = new Stack<int>();
-                    stack.Push(0);
-                    while (stack.Count > 0)
+                    if (false == dataCopy.box.IsHit(treeNode.Box)) continue;
+
+                    // 子节点下标为 4(i+1)-3, 4(i+1)-2, 4(i+1)-1, 4(i+1)-0
+                    // TODO: 可以改为提前判断是否在子节点，再push，减少出栈入栈次数
+                    stack.Push(4 * (treeIdx + 1) - 3);
+                    stack.Push(4 * (treeIdx + 1) - 2);
+                    stack.Push(4 * (treeIdx + 1) - 1);
+                    stack.Push(4 * (treeIdx + 1) - 0);
+
+                    for (var j = 0; j < treeNode.ColliderCount; j++)
                     {
-                        var index = stack.Pop();
-                        if (index < 0 || index >= Quadtree.Length) continue;
-
-                        var treeNode = Quadtree[index];
-                        var aabb = treeNode.Box;
-                        if (false == dataCopy.box.IsHit(aabb)) continue;
-
-                        // 子节点下标为 4(i+1)-3, 4(i+1)-2, 4(i+1)-1, 4(i+1)-0
-                        // TODO: 可以改为提前判断是否在子节点，再push，减少出栈入栈次数
-                        stack.Push(4 * (index + 1) - 3);
-                        stack.Push(4 * (index + 1) - 2);
-                        stack.Push(4 * (index + 1) - 1);
-                        stack.Push(4 * (index + 1) - 0);
-
-                        for (var j = 0; j < treeNode.ColliderCount; j++)
+                        var otherColliderData = ReadCollidersInTree[treeNode.ColliderStartIdx + j];
+                        if (dataCopy.Uid == otherColliderData.Uid) continue;
+                        if (dataCopy.CheckHit(otherColliderData))
                         {
-                            var otherColliderData = AllColliders[treeNode.ColliderStartIdx + j];
-                            if (dataCopy.Uid == otherColliderData.Uid) continue;
-                            if (dataCopy.CheckHit(otherColliderData))
-                            {
-                                dataCopy.IsInHit = true;
-                            }
+                            dataCopy.IsInHit = true;
                         }
                     }
-
-                    CheckedColliders[i] = dataCopy;
                 }
+
+                WriteColliders[i] = dataCopy;
             }
         }
 
         private void CheckHit()
         {
             var jobQuadtree = new NativeArray<QuadtreeNodeJobData>(m_Quadtree.Length, Allocator.TempJob);
-            var jobAllColliders = new NativeArray<MyCircleColliderData>(m_AllColliders.Count, Allocator.TempJob);
-
+            var jobReadAllColliders = new NativeArray<MyCircleColliderData>(m_AllColliders.Count, Allocator.TempJob);
             var collidersPreSum = 0;
             for (var i = 0; i < m_Quadtree.Length; i++)
             {
                 for (var j = 0; j < m_Quadtree[i].Colliders.Count; j++)
                 {
-                    jobAllColliders[collidersPreSum + j] = m_Quadtree[i].Colliders[j].Data;
+                    jobReadAllColliders[collidersPreSum + j] = m_Quadtree[i].Colliders[j].Data;
                 }
 
                 jobQuadtree[i] = new QuadtreeNodeJobData
@@ -263,67 +258,32 @@ namespace HitEngine.OOP
                 collidersPreSum += m_Quadtree[i].Colliders.Count;
             }
 
-            var jobs = new CheckHitJob[CalJobCount()];
-            var jobHandles = new JobHandle[CalJobCount()];
-            for (var i = 0; i < jobHandles.Length; i++)
+            var jobWriteAllColliders = new NativeArray<MyCircleColliderData>(m_AllColliders.Count, Allocator.TempJob);
+            for (var i = 0; i < m_AllColliders.Count; i++)
             {
-                jobs[i] = CreateCheckHitJob(jobQuadtree, jobAllColliders, i);
-                jobHandles[i] = jobs[i].Schedule();
+                jobWriteAllColliders[i] = m_AllColliders[i].Data;
             }
 
-            foreach (var jobHandle in jobHandles)
+            var job = new CheckHitJob
             {
-                jobHandle.Complete();
-            }
+                WriteColliders = jobWriteAllColliders,
+                Quadtree = jobQuadtree,
+                ReadCollidersInTree = jobReadAllColliders
+            };
 
-            for (var i = 0; i < jobs.Length; i++)
+            // 第一个参数为需要指定split参数的总长度，也往往意味着JobParallel中的Execute()会执行多少次，入参即为 0~总长度
+            // 第二个参数为指定一个bath执行多少个Execute，一个bath可以认为是一个Job
+            job.Schedule(m_AllColliders.Count, ColliderNumPerJob).Complete();
+
+            for (var i = 0; i < jobWriteAllColliders.Length; i++)
             {
-                for (var j = 0; j < ColliderNumPerJob; j++)
-                {
-                    var realIdx = i * ColliderNumPerJob + j;
-                    if (realIdx >= m_AllColliders.Count) continue;
-                    m_AllColliders[realIdx].Data = jobs[i].CheckedColliders[j];
-                    m_AllColliders[realIdx].FlushHitStatus();
-                }
+                m_AllColliders[i].Data = jobWriteAllColliders[i];
+                m_AllColliders[i].FlushHitStatus();
             }
 
             jobQuadtree.Dispose();
-            jobAllColliders.Dispose();
-            foreach (var job in jobs)
-            {
-                job.CheckedColliders.Dispose();
-            }
-        }
-
-        private int CalJobCount()
-        {
-            if (m_AllColliders.Count == 0) return 1;
-
-            if (m_AllColliders.Count % ColliderNumPerJob == 0)
-            {
-                return m_AllColliders.Count / ColliderNumPerJob;
-            }
-
-            return (m_AllColliders.Count / ColliderNumPerJob) + 1;
-        }
-
-        private CheckHitJob CreateCheckHitJob(NativeArray<QuadtreeNodeJobData> jobQuadtree, NativeArray<MyCircleColliderData> jobAllColliders, int jobIndex)
-        {
-            var leftCollidersNum = m_AllColliders.Count - jobIndex * ColliderNumPerJob;
-            var checkedColliderNum = Mathf.Min(leftCollidersNum, ColliderNumPerJob);
-            
-            var jobCheckedColliders = new NativeArray<MyCircleColliderData>(checkedColliderNum, Allocator.TempJob);
-            for (var i = 0; i < checkedColliderNum; i++)
-            {
-                jobCheckedColliders[i] = m_AllColliders[ColliderNumPerJob * jobIndex + i].Data;
-            }
-
-            return new CheckHitJob
-            {
-                CheckedColliders = jobCheckedColliders,
-                Quadtree = jobQuadtree,
-                AllColliders = jobAllColliders
-            };
+            jobReadAllColliders.Dispose();
+            jobWriteAllColliders.Dispose();
         }
     }
 }

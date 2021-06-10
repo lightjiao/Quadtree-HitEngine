@@ -16,7 +16,7 @@ namespace HitEngine.OOP
 
         private void Start()
         {
-            backgroundLength = FindObjectOfType<QuadtreeCheckHitEngine>().BackgroundLength;
+            backgroundLength = 100;//FindObjectOfType<QuadtreeCheckHitEngine>().BackgroundLength;
         }
 
         private void Update()
