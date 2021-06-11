@@ -1,19 +1,21 @@
+using System;
 using UnityEngine;
+using Unity.Mathematics;
 
 namespace HitEngine.OOP
 {
     public struct MyCircleColliderData
     {
         public int Uid;
-        public Vector2 point;
+        public float2 point;
         public float radius;
         public int inQuadTreeIndex;
         public bool IsInHit;
         public AABB box;
-        
+
         public bool CheckHit(MyCircleColliderData other)
         {
-            var disSqr = (point - other.point).sqrMagnitude;
+            var disSqr = math.lengthsq(point - other.point);
             var radiusSumSqr = (radius + other.radius) * (radius + other.radius);
 
             return disSqr <= radiusSumSqr;
@@ -28,11 +30,13 @@ namespace HitEngine.OOP
 
         public void InitRandCircle()
         {
+            var random = new Unity.Mathematics.Random((uint)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds);
+
             Data = new MyCircleColliderData
             {
                 Uid = -1,
                 point = new Vector2(),
-                radius = Random.Range(1f, 3f),
+                radius = random.NextFloat(1, 3),
                 inQuadTreeIndex = -1,
                 IsInHit = false,
                 box = new AABB(),

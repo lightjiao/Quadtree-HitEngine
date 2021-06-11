@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
@@ -52,6 +53,7 @@ namespace HitEngine.OOP
             }
         }
 
+        [BurstCompile]
         private struct CheckHitJob : IJobParallelFor
         {
             public NativeArray<MyCircleColliderData> CheckedColliderDatas;
@@ -61,10 +63,14 @@ namespace HitEngine.OOP
             {
                 var dataCopy = CheckedColliderDatas[index];
                 dataCopy.IsInHit = false;
-                foreach (var otherData in AllColliderDatas)
+                
+                // 使用foreach的话会有Burst编译报错:
+                // Burst error BC1005: The `try` construction is not supported
+                for (var i = 0; i < AllColliderDatas.Length; i++)
                 {
-                    if (dataCopy.Uid == otherData.Uid) continue;
-                    if (dataCopy.CheckHit(otherData))
+                    // var otherData = AllColliderDatas[i];
+                    if (dataCopy.Uid == AllColliderDatas[i].Uid) continue;
+                    if (dataCopy.CheckHit(AllColliderDatas[i]))
                     {
                         dataCopy.IsInHit = true;
                     }

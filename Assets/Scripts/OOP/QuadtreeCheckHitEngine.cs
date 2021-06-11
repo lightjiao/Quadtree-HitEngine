@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Burst;
 using UnityEngine;
 using Unity.Jobs;
 using Unity.Collections;
@@ -192,7 +193,11 @@ namespace HitEngine.OOP
             public int ColliderCount; // 包含的碰撞体结束下标(exclude)
         }
 
-        // 碰撞检测的Job
+        /// <remarks>
+        /// Burst中不能创建 managed type，可以理解为被托管的类型，会有GC的类型
+        /// 所以将之前的stack的实现换成了递归调用函数
+        /// </remarks>
+        [BurstCompile]
         private struct CheckHitJob : IJobParallelFor
         {
             public NativeArray<MyCircleColliderData> WriteColliders;
@@ -203,36 +208,32 @@ namespace HitEngine.OOP
             {
                 var dataCopy = WriteColliders[i];
                 dataCopy.IsInHit = false;
+                CheckHit(ref dataCopy, 0);
+                WriteColliders[i] = dataCopy;
+            }
 
-                var stack = new Stack<int>();
-                stack.Push(0);
-                while (stack.Count > 0)
+            private void CheckHit(ref MyCircleColliderData dataCopy, int treeIdx)
+            {
+                if (treeIdx < 0 || treeIdx >= Quadtree.Length) return;
+                var treeNode = Quadtree[treeIdx];
+
+                if (false == dataCopy.box.IsHit(treeNode.Box)) return;
+
+                for (var j = 0; j < treeNode.ColliderCount; j++)
                 {
-                    var treeIdx = stack.Pop();
-                    if (treeIdx < 0 || treeIdx >= Quadtree.Length) continue;
-                    var treeNode = Quadtree[treeIdx];
-
-                    if (false == dataCopy.box.IsHit(treeNode.Box)) continue;
-
-                    // 子节点下标为 4(i+1)-3, 4(i+1)-2, 4(i+1)-1, 4(i+1)-0
-                    // TODO: 可以改为提前判断是否在子节点，再push，减少出栈入栈次数
-                    stack.Push(4 * (treeIdx + 1) - 3);
-                    stack.Push(4 * (treeIdx + 1) - 2);
-                    stack.Push(4 * (treeIdx + 1) - 1);
-                    stack.Push(4 * (treeIdx + 1) - 0);
-
-                    for (var j = 0; j < treeNode.ColliderCount; j++)
+                    var otherColliderData = ReadCollidersInTree[treeNode.ColliderStartIdx + j];
+                    if (dataCopy.Uid == otherColliderData.Uid) continue;
+                    if (dataCopy.CheckHit(otherColliderData))
                     {
-                        var otherColliderData = ReadCollidersInTree[treeNode.ColliderStartIdx + j];
-                        if (dataCopy.Uid == otherColliderData.Uid) continue;
-                        if (dataCopy.CheckHit(otherColliderData))
-                        {
-                            dataCopy.IsInHit = true;
-                        }
+                        dataCopy.IsInHit = true;
                     }
                 }
 
-                WriteColliders[i] = dataCopy;
+                // 子节点下标为 4(i+1)-3, 4(i+1)-2, 4(i+1)-1, 4(i+1)-0
+                CheckHit(ref dataCopy, 4 * (treeIdx + 1) - 3);
+                CheckHit(ref dataCopy, 4 * (treeIdx + 1) - 2);
+                CheckHit(ref dataCopy, 4 * (treeIdx + 1) - 1);
+                CheckHit(ref dataCopy, 4 * (treeIdx + 1) - 0);
             }
         }
 
